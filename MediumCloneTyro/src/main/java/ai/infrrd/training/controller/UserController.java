@@ -1,10 +1,12 @@
 package ai.infrrd.training.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,14 +19,14 @@ import ai.infrrd.training.exception.RecordNotFoundException;
 import ai.infrrd.training.service.UserSignUpService;
 
 @RestController
-public class SignUpController {
+@RequestMapping("/user")
+public class UserController {
 	
 	@Autowired
 	UserSignUpService signUpService;
 	
-	
-	
-	@RequestMapping(path = "/user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	@RequestMapping(path = "/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserDto> addUser(@RequestBody UserDto user) throws BusinessException, RecordNotFoundException {
 		
 		signUpService.addUser(user);
@@ -33,5 +35,25 @@ public class SignUpController {
 		return ResponseEntity.created(locationPlace).body(user);
 
 	}
+	
+	@RequestMapping(path ="login/{username}/{password}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UserDto> getByNameAndCost(@PathVariable("username") String username, @PathVariable String password) throws BusinessException{
+		ResponseEntity<UserDto> user=null;
+		user=signUpService.getByUsernameAndPassword(username, password).map(p->ResponseEntity.ok(p))
+				.orElseThrow(()->new BusinessException("Requested user not found"));
+		return user;
+
+	}
+//	public ResponseEntity<Product> getProduct(@PathVariable int pid) throws BuisnessException{
+//		ResponseEntity<Product> product=null;
+//			product=productBo.getProduct(pid)
+//					.map(p->ResponseEntity.ok(p))
+//					.orElseThrow(()->new BuisnessException("Requested ID not present"));
+//
+//		return product;
+//		
+//	}
+	
+	
 
 }

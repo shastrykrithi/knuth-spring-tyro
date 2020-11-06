@@ -2,6 +2,7 @@ package ai.infrrd.training.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +12,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import ai.infrrd.training.service.UserDetailsImpl;
+
+import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.repository.UserRepository;
 
@@ -22,15 +26,18 @@ public class MongoUserDetailsService implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Users user = repository.findByUsername(username);
+		Optional<UserDto> user = repository.findByUsername(username);
 
-	    if(user == null) {
-	      throw new UsernameNotFoundException("User not found");
-	    }
-
-	    List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("user"));
-
-	    return new User(user.getUsername(), user.getPassword(), authorities);
+//	    if(user == null) {
+//	      throw new UsernameNotFoundException("User not found");
+//	    }
+//
+//	    List<SimpleGrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("user"));
+//
+//	    return new User(user.getUsername(), user.getPassword(), authorities);
+		user.orElseThrow(() -> new UsernameNotFoundException("Invalid UserName"));
+		
+		return user.map(UserDetailsImpl::new).get();
 	}
 
 }
