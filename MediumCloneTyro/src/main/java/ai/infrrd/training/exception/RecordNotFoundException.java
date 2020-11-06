@@ -1,6 +1,8 @@
 package ai.infrrd.training.exception;
 
-public class RecordNotFoundException extends Exception {
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+public class RecordNotFoundException extends UsernameNotFoundException {
 
 	/**
 	 * 

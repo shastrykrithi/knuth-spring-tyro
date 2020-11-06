@@ -11,6 +11,7 @@ import ai.infrrd.training.model.Users;
 @Repository
 public interface UserRepository extends MongoRepository<Users, String> {
 	
-	Optional<UserDto> findByUsername(String username);
+	UserDto findByUsername(String username);
+	UserDto findByEmail(String email);
 
 }

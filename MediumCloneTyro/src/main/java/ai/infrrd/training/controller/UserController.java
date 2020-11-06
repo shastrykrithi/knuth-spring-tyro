@@ -36,24 +36,14 @@ public class UserController {
 
 	}
 	
-	@RequestMapping(path ="login/{username}/{password}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserDto> getByNameAndCost(@PathVariable("username") String username, @PathVariable String password) throws BusinessException{
+	@RequestMapping(path ="login/{email}/{password}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UserDto> getByEmailAndPassword(@PathVariable("email") String email, @PathVariable String password) throws BusinessException{
 		ResponseEntity<UserDto> user=null;
-		user=signUpService.getByUsernameAndPassword(username, password).map(p->ResponseEntity.ok(p))
+		user=signUpService.getByEmailAndPassword(email, password).map(p->ResponseEntity.ok(p))
 				.orElseThrow(()->new BusinessException("Requested user not found"));
 		return user;
+		
 
 	}
-//	public ResponseEntity<Product> getProduct(@PathVariable int pid) throws BuisnessException{
-//		ResponseEntity<Product> product=null;
-//			product=productBo.getProduct(pid)
-//					.map(p->ResponseEntity.ok(p))
-//					.orElseThrow(()->new BuisnessException("Requested ID not present"));
-//
-//		return product;
-//		
-//	}
-	
-	
 
 }

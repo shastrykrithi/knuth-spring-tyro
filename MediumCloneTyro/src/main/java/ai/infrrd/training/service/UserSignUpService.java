@@ -34,15 +34,18 @@ public class UserSignUpService implements UserService {
 		return true;
 	}
 
-	public Optional<UserDto> getByUsernameAndPassword(String username, String password) throws BusinessException {
-		UserDetails user=userDetailsService.loadUserByUsername(username);
+	public Optional<UserDto> getByEmailAndPassword(String email, String password) throws BusinessException {
+		UserDetails user=userDetailsService.loadUserByUsername(email);
 		if(passwordEncoder.matches(password, user.getPassword())) {
-			return userRepo.findByUsername(username);
+			return Optional.ofNullable(userRepo.findByEmail(email));
 		}
 		else {
 			throw new BusinessException("Password not match");
 		}
-	}
+	
+			
+			
 
+}
 }
 
