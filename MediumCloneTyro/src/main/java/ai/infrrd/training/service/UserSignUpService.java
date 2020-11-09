@@ -1,6 +1,9 @@
 package ai.infrrd.training.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,9 @@ public class UserSignUpService implements UserService {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private MongoUserDetailsService userDetailsService;
+	
 	@Override
 	public boolean addUser(UserDto userData) throws BusinessException {
 		Users user=new Users();
@@ -28,5 +34,18 @@ public class UserSignUpService implements UserService {
 		return true;
 	}
 
+	public Optional<UserDto> getByEmailAndPassword(String email, String password) throws BusinessException {
+		UserDetails user=userDetailsService.loadUserByUsername(email);
+		if(passwordEncoder.matches(password, user.getPassword())) {
+			return Optional.ofNullable(userRepo.findByEmail(email));
+		}
+		else {
+			throw new BusinessException("Password not match");
+		}
+	
+			
+			
+
+}
 }
 

@@ -6,5 +6,6 @@ import ai.infrrd.training.exception.BusinessException;
 public interface UserService {
 	
 	public boolean addUser(UserDto user)throws BusinessException;
+	
 
 }

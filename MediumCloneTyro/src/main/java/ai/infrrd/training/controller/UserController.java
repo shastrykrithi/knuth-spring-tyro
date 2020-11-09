@@ -1,10 +1,12 @@
 package ai.infrrd.training.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,20 +19,30 @@ import ai.infrrd.training.exception.RecordNotFoundException;
 import ai.infrrd.training.service.UserSignUpService;
 
 @RestController
-public class SignUpController {
+@RequestMapping("/user")
+public class UserController {
 	
 	@Autowired
 	UserSignUpService signUpService;
 	
-	
-	
-	@RequestMapping(path = "/user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	@RequestMapping(path = "/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserDto> addUser(@RequestBody UserDto user) throws BusinessException, RecordNotFoundException {
 		
 		signUpService.addUser(user);
 		final URI locationPlace = MvcUriComponentsBuilder.fromController(getClass()).path("/user/{username}")
 				.buildAndExpand(user.getUsername()).toUri();
 		return ResponseEntity.created(locationPlace).body(user);
+
+	}
+	
+	@RequestMapping(path ="login/{email}/{password}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UserDto> getByEmailAndPassword(@PathVariable("email") String email, @PathVariable String password) throws BusinessException{
+		ResponseEntity<UserDto> user=null;
+		user=signUpService.getByEmailAndPassword(email, password).map(p->ResponseEntity.ok(p))
+				.orElseThrow(()->new BusinessException("Requested user not found"));
+		return user;
+		
 
 	}
 
