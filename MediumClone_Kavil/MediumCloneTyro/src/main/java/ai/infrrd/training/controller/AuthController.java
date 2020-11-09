@@ -32,12 +32,13 @@ public class AuthController {
 	}
 
 	@PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserDto> getByEmailAndPassword(@RequestParam("email") String email,
-			@RequestParam("password") String password) throws BusinessException {
-		ResponseEntity<UserDto> user = null;
-		user = signUpService.getByEmailAndPassword(email, password).map(p -> ResponseEntity.ok(p))
+	public ResponseEntity<UserDto> getByEmailAndPassword(@RequestBody UserDto user) throws BusinessException {
+		String email = user.getEmail();
+		String password = user.getPassword();
+		ResponseEntity<UserDto> user1 = null;
+		user1 = signUpService.getByEmailAndPassword(email, password).map(p -> ResponseEntity.ok(p))
 				.orElseThrow(() -> new BusinessException("Requested user not found"));
-		return user;
+		return user1;
 
 	}
 

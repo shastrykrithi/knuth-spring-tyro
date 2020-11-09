@@ -56,8 +56,5 @@ public class Users {
 		return "User [username=" + username + ", password=" + password + ", email=" + email
 				+ "]";
 	}
-	
-	
-	
 
 }

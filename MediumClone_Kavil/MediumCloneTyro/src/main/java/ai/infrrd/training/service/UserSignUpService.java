@@ -27,7 +27,7 @@ public class UserSignUpService implements UserService {
 	@Override
 	public boolean addUser(UserDto userData) throws BusinessException {
 		Users user = new Users();
-		if (userData.getPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()]).{8, 32}$")) {
+		if (userData.getPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()]).{8,32}$")) {
 			if (userData.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z]+\\.[A-Za-z]{2,4}$")) {
 				if (userData.getUsername().matches("^[A-Za-z0-9].{5,15}$")) {
 					user.setUsername(userData.getUsername());
