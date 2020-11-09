@@ -1,4 +1,4 @@
-package ai.infrrd.training.config;
+package ai.infrrd.training.jwt;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import ai.infrrd.training.service.JwtUserDetailsService;
-
+import ai.infrrd.training.util.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 
 @Component

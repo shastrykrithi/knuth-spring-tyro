@@ -1,4 +1,4 @@
-package ai.infrrd.training.config;
+package ai.infrrd.training.jwt;
 
 import java.io.IOException;
 import java.io.Serializable;

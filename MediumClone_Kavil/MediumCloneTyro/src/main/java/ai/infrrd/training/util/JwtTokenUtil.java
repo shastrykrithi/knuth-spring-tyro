@@ -1,4 +1,4 @@
-package ai.infrrd.training.config;
+package ai.infrrd.training.util;
 
 import java.io.Serializable;
 import java.util.Date;

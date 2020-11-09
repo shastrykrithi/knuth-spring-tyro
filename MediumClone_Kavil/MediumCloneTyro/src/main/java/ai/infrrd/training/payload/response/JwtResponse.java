@@ -1,4 +1,4 @@
-package ai.infrrd.training.model;
+package ai.infrrd.training.payload.response;
 
 import java.io.Serializable;
 
