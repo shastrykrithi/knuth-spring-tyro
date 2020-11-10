@@ -29,7 +29,7 @@ import ai.infrrd.training.service.SignUpService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/tyro")
 public class AuthenticationController {
 	@Autowired
 	AuthenticationManager authenticationManager;
