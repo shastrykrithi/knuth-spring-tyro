@@ -11,6 +11,11 @@ This is a Medium Clone Application developed on JAVA / MAVEN / SPRING BOOT (Vers
 ## Explore Rest APIs
 The app defines following APIs:
 >
+    Swagger JSON
+    GET /v3/api-docs
+    
+    Swagger HTML
+    GET /swagger-ui-custom.html
    
     POST /tyro/signin
     Host: localhost/8081
