@@ -1,29 +1,21 @@
-package ai.infrrd.training.model;
+package ai.infrrd.training.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection="users")
-public class Users {
+public class UserDto {
 	
-	@Id
-	private String id;
-	@Indexed(unique = true)
+	
 	private String username;
 	private String password;
-	@Indexed(unique = true)
 	private String email;
 	
 	
 	
-	public Users() {
+	public UserDto() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
 	
-	public Users(String username, String password, boolean isActive,String email) {
+	public UserDto(String username, String password, boolean isActive,String email) {
 		super();
 		this.username = username;
 		this.password = password;
