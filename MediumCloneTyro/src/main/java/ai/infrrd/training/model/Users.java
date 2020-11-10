@@ -23,11 +23,21 @@ public class Users {
 	}
 	
 	
-	public Users(String username, String password, boolean isActive,String email) {
+	public Users(String username, String password,String email) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.email = email;
+	}
+
+
+	public String getId() {
+		return id;
+	}
+
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 
