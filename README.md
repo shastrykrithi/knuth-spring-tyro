@@ -10,10 +10,13 @@ This is a Medium Clone Application developed on JAVA / MAVEN / SPRING BOOT (Vers
 3. The App will start running at (http://localhost/8081/tyro)
 ## Explore Rest APIs
 The app defines following APIs:
-> - POST /tyro/signin
+>
+   
+    POST /tyro/signin
     Host: localhost/8081
     Accept: application/json
-> - POST /tyro/signup
+    
+    POST /tyro/signup
     Host: localhost/8081
     Accept: application/json
     
