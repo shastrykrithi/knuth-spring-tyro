@@ -30,7 +30,7 @@ public class SignUpService{
 					user.setPassword(passwordEncoder.encode(userData.getPassword()));
 					userRepo.save(user);
 				} else {
-					throw new BusinessException("Username should not exceed 15 characters");
+					throw new BusinessException("Username must be atleast 5 characters and should not exceed 15 characters");
 				}
 				
 			} else {
