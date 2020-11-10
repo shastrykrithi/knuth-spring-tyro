@@ -1,0 +1,5 @@
+package ai.infrrd.training.config;
+
+public class SwaggerConfig {
+
+}
