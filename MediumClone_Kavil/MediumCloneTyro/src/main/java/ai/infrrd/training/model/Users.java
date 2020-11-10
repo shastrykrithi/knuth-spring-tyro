@@ -19,14 +19,25 @@ public class Users {
 	
 	public Users() {
 		super();
+		// TODO Auto-generated constructor stub
 	}
 	
 	
-	public Users(String username, String password, boolean isActive,String email) {
+	public Users(String username, String password,String email) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.email = email;
+	}
+
+
+	public String getId() {
+		return id;
+	}
+
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 
@@ -56,5 +67,8 @@ public class Users {
 		return "User [username=" + username + ", password=" + password + ", email=" + email
 				+ "]";
 	}
+	
+	
+	
 
 }

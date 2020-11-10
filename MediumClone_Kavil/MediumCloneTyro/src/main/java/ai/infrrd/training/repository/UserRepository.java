@@ -1,5 +1,7 @@
 package ai.infrrd.training.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +11,9 @@ import ai.infrrd.training.model.Users;
 @Repository
 public interface UserRepository extends MongoRepository<Users, String> {
 	
-	UserDto findByUsername(String username);
-	UserDto findByEmail(String email);
+	Optional<UserDto> findByUsername(String username);
+	Optional<UserDto> findByEmail(String email);
+	boolean existsByUsername(String username);
+	boolean existsByEmail(String email);
 
 }
