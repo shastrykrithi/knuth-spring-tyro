@@ -9,5 +9,4 @@ public class MediumCloneTyroApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MediumCloneTyroApplication.class, args);
 	}
-
 }

@@ -27,6 +27,7 @@ import ai.infrrd.training.service.SignUpService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@RequestMapping("/tyro")
 public class AuthenticationController {
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -43,7 +44,7 @@ public class AuthenticationController {
 	@Autowired
 	SignUpService signUpService;
 
-	@PostMapping("/login")
+	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
 		Authentication authentication = authenticationManager.authenticate(
