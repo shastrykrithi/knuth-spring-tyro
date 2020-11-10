@@ -11,8 +11,14 @@ This is a Medium Clone Application developed on JAVA / MAVEN / SPRING BOOT (Vers
 ## Explore Rest APIs
 The app defines following APIs:
 > - POST /tyro/signin
+    Host: localhost/8081
+    Accept: application/json
 > - POST /tyro/signup
+    Host: localhost/8081
+    Accept: application/json
+    
 You can test them using postman or any other rest client.
+
 ---
 ## Contact
 - Name : Krithi > shastrykrithi2197@gmail.com
