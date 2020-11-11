@@ -1,0 +1,9 @@
+spring.data.mongodb.database=TyroDB
+spring.data.mongodb.port=27017
+spring.data.mongodb.host=localhost
+spring.data.mongodb.auto-index-creation=true
+server.port=8081
+# App Properties
+tyro.app.jwtSecret= tyroKoderSecretKey
+tyro.app.jwtExpirationMs= 36000
+
