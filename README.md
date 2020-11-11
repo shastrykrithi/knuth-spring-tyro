@@ -8,6 +8,8 @@ This is a Medium Clone Application developed on JAVA / MAVEN / SPRING BOOT (Vers
 1. Clone the Application (https://github.com/shastrykrithi/knuth-spring-tyro.git)
 2. Build and Run the App as a Spring Boot Application using Maven
 3. The App will start running at (http://localhost/8081/tyro)
+
+Visit the application at -> (https://tyro-team-knuth.herokuapp.com/)
 ## Explore Rest APIs
 The app defines following APIs:
 >
@@ -16,14 +18,6 @@ The app defines following APIs:
     
     Swagger HTML
     GET /swagger-ui-custom.html
-   
-    POST /tyro/signin
-    Host: localhost/8081
-    Accept: application/json
-    
-    POST /tyro/signup
-    Host: localhost/8081
-    Accept: application/json
     
 You can test them using postman or any other rest client.
 
