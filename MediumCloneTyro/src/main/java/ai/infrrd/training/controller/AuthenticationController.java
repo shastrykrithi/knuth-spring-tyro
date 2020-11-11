@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
-import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.LoginRequest;
 import ai.infrrd.training.payload.request.SignupRequest;
-import ai.infrrd.training.payload.response.JwtResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
+import ai.infrrd.training.payload.response.SignInResponse;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
 import ai.infrrd.training.security.services.UserDetailsImplementation;
@@ -57,7 +56,9 @@ public class AuthenticationController {
 		
 		UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();		
 		
-		return ResponseEntity.ok(new JwtResponse(jwt, 
+		return ResponseEntity.ok()
+				.header("Authorization-code", jwt)
+				.body(new SignInResponse( 
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 
 												 userDetails.getEmail()));
