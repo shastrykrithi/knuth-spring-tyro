@@ -1,6 +1,7 @@
 package ai.infrrd.training.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import ai.infrrd.training.payload.request.LoginRequest;
 import ai.infrrd.training.payload.request.SignupRequest;
 import ai.infrrd.training.payload.response.JwtResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
+import ai.infrrd.training.payload.response.SignInResponse;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
 import ai.infrrd.training.security.services.UserDetailsImplementation;
@@ -45,6 +47,7 @@ public class AuthenticationController {
 	
 	@Autowired
 	SignUpService signUpService;
+	
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser( @RequestBody LoginRequest loginRequest) {
@@ -57,7 +60,9 @@ public class AuthenticationController {
 		
 		UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();		
 		
-		return ResponseEntity.ok(new JwtResponse(jwt, 
+		return ResponseEntity.ok()
+				.header("Authorization-code", jwt)
+				.body(new SignInResponse( 
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 
 												 userDetails.getEmail()));
