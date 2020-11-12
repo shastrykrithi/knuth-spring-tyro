@@ -17,7 +17,7 @@ The app defines following APIs:
     GET /v3/api-docs
     
     Swagger HTML
-    GET /swagger-ui-custom.html
+    GET /swagger-ui/
     
 You can test them using postman or any other rest client.
 
