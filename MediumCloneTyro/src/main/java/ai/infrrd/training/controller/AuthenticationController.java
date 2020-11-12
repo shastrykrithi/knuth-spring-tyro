@@ -24,6 +24,7 @@ import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
 import ai.infrrd.training.security.services.UserDetailsImplementation;
 import ai.infrrd.training.service.SignUpService;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 
@@ -46,6 +47,7 @@ public class AuthenticationController {
 	@Autowired
 	SignUpService signUpService;
 	
+	@ApiIgnore
 	@GetMapping("/")
 	public String basePath() {
 		return "Tyro";
@@ -62,9 +64,9 @@ public class AuthenticationController {
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
 		UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();		
-		
+		String authCode="Bearer "+jwt; 
 		return ResponseEntity.ok()
-				.header("Authorization-code", jwt)
+				.header("Authorization-code", authCode)
 				.body(new SignInResponse( 
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 
