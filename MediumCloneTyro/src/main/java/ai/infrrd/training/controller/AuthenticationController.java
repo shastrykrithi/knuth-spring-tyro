@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
-import ai.infrrd.training.payload.request.LoginRequest;
-import ai.infrrd.training.payload.request.SignupRequest;
+import ai.infrrd.training.payload.request.SignInRequest;
+import ai.infrrd.training.payload.request.SignUpRequest;
 import ai.infrrd.training.payload.response.MessageResponse;
 import ai.infrrd.training.payload.response.SignInResponse;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
 import ai.infrrd.training.security.services.UserDetailsImplementation;
 import ai.infrrd.training.service.SignUpService;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
 
@@ -55,10 +56,13 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signin")
-	public ResponseEntity<?> authenticateUser( @RequestBody LoginRequest loginRequest) {
+	@ApiOperation(value="Login to the system",
+	notes="Provide email and password to log-in",
+	response=SignInResponse.class)
+	public ResponseEntity<?> authenticateUser( @RequestBody SignInRequest signInRequest) {
 
 		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+				new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = jwtUtils.generateJwtToken(authentication);
@@ -74,7 +78,10 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
+	@ApiOperation(value="Add a new User",
+	notes="Provide email,password and username to sign-up",
+	response=MessageResponse.class)
+	public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()

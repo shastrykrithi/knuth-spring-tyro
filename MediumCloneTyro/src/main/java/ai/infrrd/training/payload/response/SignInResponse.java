@@ -1,10 +1,18 @@
 package ai.infrrd.training.payload.response;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="Response body for successful sign-in")
 public class SignInResponse {
 	
+	@ApiModelProperty(notes="User ID")
 	private String id;
-	private String username;
-	private String email;
+	@ApiModelProperty(notes="User username")
+    private String username;
+	@ApiModelProperty(notes="User email")
+    private String email;
+	
 	
 	
 	public SignInResponse(String id, String username, String email) {
