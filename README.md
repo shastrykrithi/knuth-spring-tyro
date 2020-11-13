@@ -9,7 +9,7 @@ This is a Medium Clone Application developed on JAVA / MAVEN / SPRING BOOT (Vers
 2. Build and Run the App as a Spring Boot Application using Maven
 3. The App will start running at (http://localhost/8081/tyro)
 
-Visit the application at -> (https://tyro-team-knuth.herokuapp.com/)
+Visit the application at -> (https://team-knuth-tyro.herokuapp.com)
 ## Explore Rest APIs
 The app defines following APIs:
 >
