@@ -1,4 +1,28 @@
-FROM openjdk:8
-EXPOSE $PORT
+#FROM openjdk:8
+#ADD target/medium-clone-tyro.jar medium-clone-tyro.jar
+#ENTRYPOINT ["java","-jar","/medium-clone-tyro.jar"]
+
+# Docker multi-stage build
+
+# 1. Building the App with Maven
+FROM maven:3-jdk-11
+
+# Just echo so we can see, if everything is there :)
+RUN ls -l
+
+# Run Maven build
+RUN mvn clean install
+
+
+# Just using the build artifact and then removing the build-container
+FROM openjdk:11-jdk
+
+
+VOLUME /tmp
+
+# Add Spring Boot app.jar to Container
+#COPY --from=0 "/target/cxf-boot-simple-*-SNAPSHOT.jar" app.jar
 ADD target/medium-clone-tyro.jar medium-clone-tyro.jar
-ENTRYPOINT ["java","-jar","/medium-clone-tyro.jar"]
+
+# Fire up our Spring Boot app by default
+CMD [ "sh", "-c", "java -Dserver.port=$PORT -Xmx300m -Xss512k -XX:CICompilerCount=2 -Dfile.encoding=UTF-8 -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom -jar /medium-clone-tyro.jar" ]
