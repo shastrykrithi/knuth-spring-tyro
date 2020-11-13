@@ -18,8 +18,6 @@ public class SignUpService{
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
-	
-
 	public boolean addUser(UserDto userData) throws BusinessException {
 		Users user=new Users();
 		if (userData.getPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()]).{8,32}$")) {
@@ -44,15 +42,6 @@ public class SignUpService{
 		return true;
 	}
 
-//	public Optional<UserDto> getByEmailAndPassword(String email, String password) throws BusinessException {
-//		UserDetails user=userDetailsService.loadUserByUsername(email);
-//		if(passwordEncoder.matches(password, user.getPassword())) {
-//			return userRepo.findByEmail(email);
-//		}
-//		else {
-//			throw new BusinessException("Password not match");
-//		}
-//	}
 
 }
 

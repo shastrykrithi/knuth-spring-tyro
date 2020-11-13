@@ -1,7 +1,3 @@
-#FROM openjdk:8
-#ADD target/medium-clone-tyro.jar medium-clone-tyro.jar
-#ENTRYPOINT ["java","-jar","/medium-clone-tyro.jar"]
-
 # Docker multi-stage build
 
 # 1. Building the App with Maven
@@ -21,7 +17,6 @@ FROM openjdk:11-jdk
 VOLUME /tmp
 
 # Add Spring Boot app.jar to Container
-#COPY --from=0 "/target/cxf-boot-simple-*-SNAPSHOT.jar" app.jar
 ADD target/medium-clone-tyro.jar medium-clone-tyro.jar
 
 # Fire up our Spring Boot app by default

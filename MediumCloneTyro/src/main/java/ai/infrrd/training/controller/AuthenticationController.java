@@ -1,6 +1,7 @@
 package ai.infrrd.training.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -68,9 +69,10 @@ public class AuthenticationController {
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
 		UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();		
-		String authCode="Bearer "+jwt; 
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Basic " + jwt);
 		return ResponseEntity.ok()
-				.header("Authorization-code", authCode)
+				.headers(headers)
 				.body(new SignInResponse( 
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 
@@ -106,11 +108,6 @@ public class AuthenticationController {
 					.badRequest()
 					.body(new MessageResponse("Error: "+e.getMessage()));
 		}
-//		Users user = new Users(signUpRequest.getUsername(), 
-//							encoder.encode(signUpRequest.getPassword()),
-//							signUpRequest.getEmail());
-//		
-//		userRepository.save(user);
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
