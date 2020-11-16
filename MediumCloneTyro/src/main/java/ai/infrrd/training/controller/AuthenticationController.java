@@ -70,7 +70,7 @@ public class AuthenticationController {
 		
 		UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();		
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Basic " + jwt);
+		headers.add("Authorization", "Bearer " + jwt);
 		return ResponseEntity.ok()
 				.headers(headers)
 				.body(new SignInResponse( 
@@ -87,17 +87,14 @@ public class AuthenticationController {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Username is already taken!"));
+					.body(new MessageResponse("Error","Username is already taken!"));
 		}
-
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Email is already in use!"));
+					.body(new MessageResponse("Error","Email is already in use!"));
 		}
-
 		// Create new user's account
-		
 		try {
 			signUpService.addUser(new UserDto(signUpRequest.getUsername(), 
 								signUpRequest.getPassword(),
@@ -106,9 +103,8 @@ public class AuthenticationController {
 			e.printStackTrace();
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: "+e.getMessage()));
+					.body(new MessageResponse("Error",e.getMessage()));
 		}
-
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		return ResponseEntity.ok(new MessageResponse("Success","User registered successfully!"));
 	}
 }

@@ -6,9 +6,11 @@ import io.swagger.annotations.ApiModel;
 public class MessageResponse {
 	
 	private String message;
+	private String result;
 
-	public MessageResponse(String message) {
+	public MessageResponse(String result,String message) {
 	    this.message = message;
+	    this.result=result;
 	  }
 
 	public String getMessage() {
@@ -18,4 +20,13 @@ public class MessageResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
+	public String getResult() {
+		return result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+	
 }
