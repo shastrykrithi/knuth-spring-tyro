@@ -7,7 +7,7 @@ This is a Medium Clone Application developed on JAVA / MAVEN / SPRING BOOT (Vers
 ## Steps to Setup
 1. Clone the Application (https://github.com/shastrykrithi/knuth-spring-tyro.git)
 2. Build and Run the App as a Spring Boot Application using Maven
-3. The App will start running at (http://localhost/8081/tyro)
+3. The App will start running at (http://localhost/8080/v1)
 
 Visit the application at -> (https://team-knuth-tyro.herokuapp.com)
 ## Explore Rest APIs
