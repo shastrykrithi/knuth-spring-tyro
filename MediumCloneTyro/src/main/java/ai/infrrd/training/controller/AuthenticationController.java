@@ -28,9 +28,7 @@ import ai.infrrd.training.service.SignUpService;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-
-
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*",exposedHeaders = "${Access-Control-Expose-Headers}" , maxAge = 3600)
 @RestController
 @RequestMapping("/v1")
 public class AuthenticationController {
