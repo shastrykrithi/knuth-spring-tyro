@@ -41,7 +41,7 @@ public class TopicsController {
 	
 	@PostMapping("/topics/follow")
 	@ApiOperation(value="User request to follow a topic",
-	notes="Provide username and topic name to follow",
+	notes="Provide username and topic id to follow",
 	response=MessageResponse.class)
 	public ResponseEntity<?> followTopic(@RequestBody TopicFollowRequest topicFollowRequest) {
 		if (!userRepository.existsByUsername(topicFollowRequest.getUsername())) {
@@ -67,7 +67,7 @@ public class TopicsController {
 	
 	@PostMapping("/topics/unfollow")
 	@ApiOperation(value="User request to unfollow a topic",
-	notes="Provide username and topic name to unfollow",
+	notes="Provide username and topic id to unfollow",
 	response=MessageResponse.class)
 	public ResponseEntity<?> unfollowTopic(@RequestBody TopicFollowRequest topicFollowRequest) {
 		if (!userRepository.existsByUsername(topicFollowRequest.getUsername())) {

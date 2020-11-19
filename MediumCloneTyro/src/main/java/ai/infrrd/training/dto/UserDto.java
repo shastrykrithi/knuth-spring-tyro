@@ -1,11 +1,17 @@
 package ai.infrrd.training.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class UserDto {
 	
 	private String id;
 	private String username;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String password;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String email;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Boolean isfollowing;
 	
 	
 	
@@ -56,6 +62,16 @@ public class UserDto {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+
+	public Boolean getIsfollowing() {
+		return isfollowing;
+	}
+
+
+	public void setIsfollowing(Boolean isfollowing) {
+		this.isfollowing = isfollowing;
 	}
 
 

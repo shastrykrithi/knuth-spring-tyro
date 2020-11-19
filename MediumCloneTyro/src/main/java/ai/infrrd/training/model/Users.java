@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import ai.infrrd.training.dto.TopicsDto;
+import ai.infrrd.training.dto.UserDto;
 
 @Document(collection="users")
 public class Users {
@@ -20,10 +21,8 @@ public class Users {
 	private String password;
 	@Indexed(unique = true)
 	private String email;
-	@DBRef(lazy = true)
-	private List<Users> followers;
-	@DBRef(lazy = true)
-	private List<Articles> articles;
+	private HashSet<UserDto> following;
+	private HashSet<ArticlesDto> articles;
 	private HashSet<TopicsDto> topics;
 	
 	
@@ -72,22 +71,22 @@ public class Users {
 	}
 
 
-	public List<Users> getFollowers() {
-		return followers;
+	public HashSet<UserDto> getFollowing() {
+		return following;
 	}
 
 
-	public void setFollowers(List<Users> followers) {
-		this.followers = followers;
+	public void setFollowing(HashSet<UserDto> following) {
+		this.following = following;
 	}
 
 
-	public List<Articles> getArticles() {
+	public HashSet<ArticlesDto> getArticles() {
 		return articles;
 	}
 
 
-	public void setArticles(List<Articles> articles) {
+	public void setArticles(HashSet<ArticlesDto> articles) {
 		this.articles = articles;
 	}
 
@@ -109,7 +108,7 @@ public class Users {
 		int result = 1;
 		result = prime * result + ((articles == null) ? 0 : articles.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
-		result = prime * result + ((followers == null) ? 0 : followers.hashCode());
+		result = prime * result + ((following == null) ? 0 : following.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + ((topics == null) ? 0 : topics.hashCode());
@@ -137,10 +136,10 @@ public class Users {
 				return false;
 		} else if (!email.equals(other.email))
 			return false;
-		if (followers == null) {
-			if (other.followers != null)
+		if (following == null) {
+			if (other.following != null)
 				return false;
-		} else if (!followers.equals(other.followers))
+		} else if (!following.equals(other.following))
 			return false;
 		if (id == null) {
 			if (other.id != null)
@@ -168,9 +167,12 @@ public class Users {
 
 	@Override
 	public String toString() {
-		return "Users [id=" + id + ", username=" + username + ", password=" + password + ", email=" + email+"]";
+		return "Users [id=" + id + ", username=" + username + ", password=" + password + ", email=" + email
+				+ ", following=" + following + ", topics=" + topics + "]";
 	}
 
+
+	
 	
 
 }

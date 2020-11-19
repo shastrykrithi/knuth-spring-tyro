@@ -12,6 +12,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ai.infrrd.training.payload.response.ErrorResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
 
 @Component
@@ -22,8 +25,9 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		logger.error("Unauthorized error: {}", authException.getMessage());
-		response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Wrong username or password!");
+		logger.error("error: {}", new MessageResponse(authException.getMessage()));
+	    String json = new ObjectMapper().writeValueAsString(new ErrorResponse(new MessageResponse(authException.getMessage())));
+	    response.getWriter().write(json);
 	}
 
 }
