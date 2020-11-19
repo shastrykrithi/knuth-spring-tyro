@@ -19,8 +19,10 @@ import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.payload.request.SignInRequest;
 import ai.infrrd.training.payload.request.SignUpRequest;
+import ai.infrrd.training.payload.response.ErrorResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
 import ai.infrrd.training.payload.response.SignInResponse;
+import ai.infrrd.training.payload.response.SuccessResponse;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
 import ai.infrrd.training.security.services.UserDetailsImplementation;
@@ -85,12 +87,12 @@ public class AuthenticationController {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error","Username is already taken!"));
+					.body(new ErrorResponse(new MessageResponse("Username is already taken!")));
 		}
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error","Email is already in use!"));
+					.body(new ErrorResponse(new MessageResponse("Email is already in use!")));
 		}
 		// Create new user's account
 		try {
@@ -101,8 +103,8 @@ public class AuthenticationController {
 			e.printStackTrace();
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error",e.getMessage()));
+					.body(new ErrorResponse(new MessageResponse(e.getMessage())));
 		}
-		return ResponseEntity.ok(new MessageResponse("Success","User registered successfully!"));
+		return ResponseEntity.ok(new SuccessResponse(new MessageResponse("User registered successfully")));
 	}
 }
