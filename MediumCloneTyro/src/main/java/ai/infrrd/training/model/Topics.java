@@ -1,13 +1,12 @@
 package ai.infrrd.training.model;
 
 import java.util.HashSet;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import ai.infrrd.training.dto.ArticlesDto;
 import ai.infrrd.training.dto.UserDto;
 
 @Document
@@ -17,10 +16,8 @@ public class Topics {
 	private String id;
 	@Indexed(unique = true)
 	private String topicName;
-	//@DBRef
 	private HashSet<UserDto> users;
-	@DBRef
-	private List<Articles> articles;
+	private HashSet<ArticlesDto> articles;
 	
 	
 	
@@ -55,10 +52,10 @@ public class Topics {
 	public void setUsers(HashSet<UserDto> users) {
 		this.users = users;
 	}
-	public List<Articles> getArticles() {
+	public HashSet<ArticlesDto> getArticles() {
 		return articles;
 	}
-	public void setArticles(List<Articles> articles) {
+	public void setArticles(HashSet<ArticlesDto> articles) {
 		this.articles = articles;
 	}
 

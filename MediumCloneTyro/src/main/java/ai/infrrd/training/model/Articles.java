@@ -1,51 +1,54 @@
 package ai.infrrd.training.model;
-import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import com.mongodb.lang.Nullable;
+
+import ai.infrrd.training.dto.TopicsDto;
+import ai.infrrd.training.dto.UserDto;
 
 @Document
 public class Articles {
 	@Id
 	private String id;
-	@Indexed(unique = true)
-	private String postId;
-	@DBRef
-	private Users user;
-	@Nullable
+	@NotNull
+	private UserDto user;
+	@NotNull
 	private String postTitle;
-	@Nullable
+	@NotNull
 	private String postDescription;
-	private Date timestamp;
-	@DBRef(lazy = true)
-	private List<Topics> topics;
+	private long timestamp;
+	private int views;
+	private HashSet<TopicsDto> topics;
 	public Articles() {
 		
 	}
 	
-	public Articles(String postId, Users user, String postTitle, String postDescription, Date timestamp,
-			List<Topics> topics) {
+	public Articles(UserDto user, String postTitle, String postDescription, long timestamp,
+			HashSet<TopicsDto> topics) {
 		super();
-		this.postId = postId;
 		this.user = user;
 		this.postTitle = postTitle;
 		this.postDescription = postDescription;
 		this.timestamp = timestamp;
 		this.topics = topics;
 	}
-	public String getPostId() {
-		return postId;
+	
+	
+	public String getId() {
+		return id;
 	}
-	public void setPostId(String postId) {
-		this.postId = postId;
+
+	public void setId(String id) {
+		this.id = id;
 	}
-	public Users getUser() {
+
+	public UserDto getUser() {
 		return user;
 	}
-	public void setUser(Users user) {
+	public void setUser(UserDto user) {
 		this.user = user;
 	}
 	public String getPostTitle() {
@@ -61,18 +64,86 @@ public class Articles {
 		this.postDescription = postDescription;
 	}
 	
-	public Date getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
 
-	public List<Topics> getTopics() {
+	public HashSet<TopicsDto> getTopics() {
 		return topics;
 	}
-	public void setTopics(List<Topics> topics) {
+	public void setTopics(HashSet<TopicsDto> topics) {
 		this.topics = topics;
 	}
+
+	
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((postDescription == null) ? 0 : postDescription.hashCode());
+		result = prime * result + ((postTitle == null) ? 0 : postTitle.hashCode());
+		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
+		result = prime * result + ((topics == null) ? 0 : topics.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		result = prime * result + views;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Articles other = (Articles) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (postDescription == null) {
+			if (other.postDescription != null)
+				return false;
+		} else if (!postDescription.equals(other.postDescription))
+			return false;
+		if (postTitle == null) {
+			if (other.postTitle != null)
+				return false;
+		} else if (!postTitle.equals(other.postTitle))
+			return false;
+		if (timestamp != other.timestamp)
+			return false;
+		if (topics == null) {
+			if (other.topics != null)
+				return false;
+		} else if (!topics.equals(other.topics))
+			return false;
+		if (user == null) {
+			if (other.user != null)
+				return false;
+		} else if (!user.equals(other.user))
+			return false;
+		if (views != other.views)
+			return false;
+		return true;
+	}
+
+
+	
+	
 }

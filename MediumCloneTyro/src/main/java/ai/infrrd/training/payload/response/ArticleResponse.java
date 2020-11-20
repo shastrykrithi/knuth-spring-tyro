@@ -9,23 +9,23 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Response body with list of Articles")
 public class ArticleResponse {
 	@ApiModelProperty(notes = "List of Articles")
-	private List<ArticlesDto> articlesDto;
+	private List<ArticlesDto> articleslist;
 
 	public ArticleResponse() {
 
 	}
 
-	public ArticleResponse(List<ArticlesDto> articlesDto) {
+	public ArticleResponse(List<ArticlesDto> articleslist) {
 		super();
-		this.articlesDto = articlesDto;
+		this.articleslist = articleslist;
 	}
 
-	public List<ArticlesDto> getArticlesDto() {
-		return articlesDto;
+	public List<ArticlesDto> getArticleslist() {
+		return articleslist;
 	}
 
-	public void setArticlesDto(List<ArticlesDto> articlesDto) {
-		this.articlesDto = articlesDto;
+	public void setArticleslist(List<ArticlesDto> articleslist) {
+		this.articleslist = articleslist;
 	}
 
 }

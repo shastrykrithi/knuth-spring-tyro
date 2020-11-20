@@ -1,13 +1,14 @@
 package ai.infrrd.training.model;
 
 import java.util.HashSet;
-import java.util.List;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import ai.infrrd.training.dto.ArticlesDto;
 import ai.infrrd.training.dto.TopicsDto;
 import ai.infrrd.training.dto.UserDto;
 
@@ -18,6 +19,7 @@ public class Users {
 	private String id;
 	@Indexed(unique = true)
 	private String username;
+	@NotNull
 	private String password;
 	@Indexed(unique = true)
 	private String email;
