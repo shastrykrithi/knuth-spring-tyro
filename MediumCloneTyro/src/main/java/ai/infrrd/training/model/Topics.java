@@ -11,57 +11,55 @@ import ai.infrrd.training.dto.UserDto;
 
 @Document
 public class Topics {
-	
+
 	@Id
 	private String id;
 	@Indexed(unique = true)
 	private String topicName;
 	private HashSet<UserDto> users;
 	private HashSet<ArticlesDto> articles;
-	
-	
-	
+
 	public Topics() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	
-	
-	public Topics(String topicName) {
-		super();
-		//this.id = id;
-		this.topicName = topicName;
+		
 	}
 
+	public Topics(String topicName) {
+		super();
+		// this.id = id;
+		this.topicName = topicName;
+	}
 
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	public String getTopicName() {
 		return topicName;
 	}
+
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
 	}
+
 	public HashSet<UserDto> getUsers() {
 		return users;
 	}
+
 	public void setUsers(HashSet<UserDto> users) {
 		this.users = users;
 	}
+
 	public HashSet<ArticlesDto> getArticles() {
 		return articles;
 	}
+
 	public void setArticles(HashSet<ArticlesDto> articles) {
 		this.articles = articles;
 	}
-
-	
-
-	
 
 	@Override
 	public int hashCode() {
@@ -71,7 +69,6 @@ public class Topics {
 		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -95,12 +92,9 @@ public class Topics {
 		return true;
 	}
 
-
 	@Override
 	public String toString() {
 		return "Topics [id=" + id + ", topicName=" + topicName + "]";
-	}	
-	
-	
+	}
 
 }

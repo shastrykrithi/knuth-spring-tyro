@@ -26,8 +26,10 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 		logger.error("error: {}", new MessageResponse(authException.getMessage()));
-	    String json = new ObjectMapper().writeValueAsString(new ErrorResponse(new MessageResponse(authException.getMessage())));
-	    response.getWriter().write(json);
+		String json = new ObjectMapper()
+				.writeValueAsString(new ErrorResponse(new MessageResponse(authException.getMessage())));
+		response.getWriter().write(json);
+		response.sendError(HttpServletResponse.SC_FORBIDDEN, authException.getMessage());
 	}
 
 }

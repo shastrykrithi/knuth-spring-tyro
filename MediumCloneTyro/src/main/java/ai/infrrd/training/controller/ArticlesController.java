@@ -2,8 +2,10 @@ package ai.infrrd.training.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +20,14 @@ import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.payload.request.ArticleRequest;
 import ai.infrrd.training.payload.response.ArticleResponse;
-import ai.infrrd.training.payload.response.ErrorResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
-import ai.infrrd.training.payload.response.SuccessResponse;
 import ai.infrrd.training.repository.ArticleRepository;
+import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.service.ArticlesService;
+import ai.infrrd.training.service.ResponseModel;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 
 @PreAuthorize("isAuthenticated()")
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -32,74 +35,92 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/v1")
 public class ArticlesController {
 
+	private static final Logger logger = LoggerFactory.getLogger(ArticlesController.class);
+
 	@Autowired
 	ArticlesService articleService;
-	
+
 	@Autowired
-	ArticleRepository  articleRepository;
-	
+	ArticleRepository articleRepository;
+
 	@Autowired
 	UserRepository userRepository;
 
+	@Autowired
+	TopicRepository topicRepository;
+
+	@Autowired
+	ResponseModel responseModel;
+
 	@GetMapping("/article/{postID}")
-	@ApiOperation(value = "Count number of clicks on a article", response = MessageResponse.class)
-	public ResponseEntity<?> articleClick(@PathVariable String postID) {
-		if (!articleRepository.existsById(postID)){
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Article not found")));
+	@ApiOperation(value = "Count number of clicks on a article", authorizations = {
+			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+	public ResponseModel articleClick(@PathVariable String postID) throws BusinessException {
+		if (!articleRepository.existsById(postID)) {
+			logger.error("Article not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Article not found");
 		}
-		
+
 		try {
-			ArticlesDto article=articleService.getArticle(postID);
-			return ResponseEntity.ok().body(article);
+			ArticlesDto article = articleService.getArticle(postID);
+			responseModel.setData("result", article);
+			return responseModel;
 		} catch (BusinessException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
 
 	@GetMapping("/feed")
-	@ApiOperation(value = "Get the List of Articles", notes = "The Articles of all users are shown up here", response = ArticleResponse.class)
-	public ResponseEntity<?> listOfArticles() {
+	@ApiOperation(value = "Get the List of Articles", notes = "The Articles of all users are shown up here", authorizations = {
+			@Authorization(value = "jwtToken") }, response = ArticleResponse.class)
+	public ResponseModel listOfArticles() throws BusinessException {
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Username not found")));
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
 		try {
-			return ResponseEntity.ok().body(new ArticleResponse(articleService.getAllArticles(AuthTokenFilter.currentUser)));
+			responseModel.setData("result", articleService.getAllArticles(AuthTokenFilter.currentUser));
+			return responseModel;
 		} catch (BusinessException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			// throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
 		}
 	}
 
 	@GetMapping("/trending")
-	@ApiOperation(value = "Get the Trending Articles", notes = "The Articles with highest clicks are shown up here", response = ArticleResponse.class)
-	public ResponseEntity<?> trendingArticles() {
+	@ApiOperation(value = "Get the Trending Articles", notes = "The Articles with highest clicks are shown up here", authorizations = {
+			@Authorization(value = "jwtToken") }, response = ArticleResponse.class)
+	public ResponseModel trendingArticles() throws BusinessException {
 		try {
-			List<ArticlesDto> articleList=articleService.getTrendingArticles();
-			return ResponseEntity.ok().body(new ArticleResponse(articleList));
+			List<ArticlesDto> articleList = articleService.getTrendingArticles();
+			responseModel.setData("result", articleList);
+			return responseModel;
 		} catch (BusinessException e) {
-			return ResponseEntity.badRequest().body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
 
 	@PostMapping("/publish")
-	@ApiOperation(value = "Publish the Article", notes = "Write the Post with title and description", response = ArticleResponse.class)
-	public ResponseEntity<?> publishArticle(@RequestBody ArticleRequest articleRequest) {
+	@ApiOperation(value = "Publish the Article", notes = "Write the Post with title and description", authorizations = {
+			@Authorization(value = "jwtToken") }, response = ArticleResponse.class)
+	public ResponseModel publishArticle(@RequestBody ArticleRequest articleRequest) throws BusinessException {
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Username not found")));
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
 		try {
 			articleService.postArticle(articleRequest);
 		} catch (BusinessException e) {
-			return ResponseEntity.badRequest().body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
-		return ResponseEntity.ok(new SuccessResponse(new MessageResponse("Article published")));
+		responseModel.setData("result", "Article published");
+		return responseModel;
+
 	}
 
 }

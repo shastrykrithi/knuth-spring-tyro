@@ -1,6 +1,6 @@
 package ai.infrrd.training.dto;
 
-public class ArticlesDto implements Comparable<ArticlesDto>{
+public class ArticlesDto implements Comparable<ArticlesDto> {
 
 	private String id;
 	private String postTitle;
@@ -10,7 +10,7 @@ public class ArticlesDto implements Comparable<ArticlesDto>{
 	private UserDto user;
 
 	public ArticlesDto() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public ArticlesDto(String postTitle, String postDescription, long timestamp) {
@@ -19,8 +19,6 @@ public class ArticlesDto implements Comparable<ArticlesDto>{
 		this.postDescription = postDescription;
 		this.timestamp = timestamp;
 	}
-	
-	
 
 	public ArticlesDto(String id, String postTitle, String postDescription, long timestamp, int views, UserDto user) {
 		super();
@@ -63,8 +61,6 @@ public class ArticlesDto implements Comparable<ArticlesDto>{
 	public void setViews(int views) {
 		this.views = views;
 	}
-	
-	
 
 	public long getTimestamp() {
 		return timestamp;
@@ -73,7 +69,6 @@ public class ArticlesDto implements Comparable<ArticlesDto>{
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
-	
 
 	public UserDto getUser() {
 		return user;
@@ -91,20 +86,8 @@ public class ArticlesDto implements Comparable<ArticlesDto>{
 
 	@Override
 	public int compareTo(ArticlesDto compareTime) {
-        int compareage=(int) ((ArticlesDto)compareTime).getTimestamp();
-//        /* For Ascending order*/
-//        return this.studentage-compareage;
+		int compareage = (int) ((ArticlesDto) compareTime).getTimestamp();
+		return (int) (compareage - this.timestamp);
+	}
 
-        return (int) (compareage-this.timestamp);
-    }
-	
-	
-
-	
-
-	
-	
-	
-
-	
 }

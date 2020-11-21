@@ -38,11 +38,7 @@ public class UserDetailsImplementation implements UserDetails {
 	public static UserDetailsImplementation build(UserDto user) {
 		List<GrantedAuthority> authorities = new ArrayList<>();
 
-		return new UserDetailsImplementation(
-				user.getId(), 
-				user.getUsername(), 
-				user.getEmail(),
-				user.getPassword(), 
+		return new UserDetailsImplementation(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(),
 				authorities);
 	}
 

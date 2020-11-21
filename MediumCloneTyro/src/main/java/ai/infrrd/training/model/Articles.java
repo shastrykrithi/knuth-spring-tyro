@@ -1,4 +1,5 @@
 package ai.infrrd.training.model;
+
 import java.util.HashSet;
 
 import javax.validation.constraints.NotNull;
@@ -22,12 +23,12 @@ public class Articles {
 	private long timestamp;
 	private int views;
 	private HashSet<TopicsDto> topics;
+
 	public Articles() {
-		
+
 	}
-	
-	public Articles(UserDto user, String postTitle, String postDescription, long timestamp,
-			HashSet<TopicsDto> topics) {
+
+	public Articles(UserDto user, String postTitle, String postDescription, long timestamp, HashSet<TopicsDto> topics) {
 		super();
 		this.user = user;
 		this.postTitle = postTitle;
@@ -35,8 +36,7 @@ public class Articles {
 		this.timestamp = timestamp;
 		this.topics = topics;
 	}
-	
-	
+
 	public String getId() {
 		return id;
 	}
@@ -48,22 +48,27 @@ public class Articles {
 	public UserDto getUser() {
 		return user;
 	}
+
 	public void setUser(UserDto user) {
 		this.user = user;
 	}
+
 	public String getPostTitle() {
 		return postTitle;
 	}
+
 	public void setPostTitle(String postTitle) {
 		this.postTitle = postTitle;
 	}
+
 	public String getPostDescription() {
 		return postDescription;
 	}
+
 	public void setPostDescription(String postDescription) {
 		this.postDescription = postDescription;
 	}
-	
+
 	public long getTimestamp() {
 		return timestamp;
 	}
@@ -75,11 +80,11 @@ public class Articles {
 	public HashSet<TopicsDto> getTopics() {
 		return topics;
 	}
+
 	public void setTopics(HashSet<TopicsDto> topics) {
 		this.topics = topics;
 	}
 
-	
 	public int getViews() {
 		return views;
 	}
@@ -143,7 +148,4 @@ public class Articles {
 		return true;
 	}
 
-
-	
-	
 }

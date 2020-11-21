@@ -19,21 +19,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import ai.infrrd.training.payload.response.ErrorResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
-import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
 import ai.infrrd.training.security.services.UserDetailsServiceImplementation;
-
-
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtils jwtUtils;
-	
+
 	@Autowired
 	private UserDetailsServiceImplementation userDetailsService;
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
-	
+
 	@Autowired
 	public static String currentUser;
 
@@ -45,12 +42,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			String jwt = parseJwt(request);
 			System.out.println(jwt);
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-				
+
 				String username = jwtUtils.getUserNameFromJwtToken(jwt);
-				System.out.println("email: "+username);
+				System.out.println("email: " + username);
 				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-				currentUser=userDetails.getUsername();
-				System.out.println("username: "+currentUser);
+				currentUser = userDetails.getUsername();
+				System.out.println("username: " + currentUser);
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -58,7 +55,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 		} catch (Exception e) {
-			//logger.error("Cannot set user authentication: {}", e);
 			logger.error("error", new ErrorResponse(new MessageResponse(e.getMessage())));
 		}
 

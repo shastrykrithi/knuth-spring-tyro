@@ -10,12 +10,17 @@ import ai.infrrd.training.model.Users;
 
 @Repository
 public interface UserRepository extends MongoRepository<Users, String> {
-	
+
 	Users findByUsername(String username);
+
 	Optional<UserDto> findByEmail(String email);
+
 	Optional<Users> findById(String id);
+
 	boolean existsByUsername(String username);
+
 	boolean existsByEmail(String email);
+
 	boolean existsById(String id);
 
 }

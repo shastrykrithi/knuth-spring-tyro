@@ -28,37 +28,46 @@ public class ArticlesService {
 
 	@Autowired
 	ArticleRepository articleRepository;
-	
+
 	@Autowired
 	UserRepository userRepo;
-	
+
 	@Autowired
 	TopicRepository topicRepository;
-	
+
 	public List<ArticlesDto> getAllArticles(String username) throws BusinessException {
-		HashSet<UserDto> followers=userRepo.findByUsername(username).getFollowing();
+		HashSet<UserDto> followers = userRepo.findByUsername(username).getFollowing();
 		List<ArticlesDto> recentArticlesList = new ArrayList<ArticlesDto>();
-		
-		
-		if (!followers.isEmpty()) {
-			for (UserDto element : followers) {
+
+		if (followers != null) {
+			if (!followers.isEmpty()) {
+				for (UserDto element : followers) {
 					recentArticlesList.addAll(articleRepository.findByUserName(element.getUsername()));
-			}
+				}
+			} else
+				throw new BusinessException("User is not following anyone yet!!!");
+
 		} else {
 			throw new BusinessException("User is not following anyone yet!!!");
 		}
-		Collections.sort(recentArticlesList);
+		if (!recentArticlesList.isEmpty()) {
+			Collections.sort(recentArticlesList);
+		} else {
+			throw new BusinessException("No articles in feed yet!!!");
+		}
+
 		return recentArticlesList;
 	}
 
 	public List<ArticlesDto> getTrendingArticles() throws BusinessException {
-		
+
 		List<ArticlesDto> articles = new ArrayList<ArticlesDto>();
 		List<Articles> sortedArticles = articleRepository.findTop4ByOrderByViewsDesc();
-		
+
 		if (!sortedArticles.isEmpty()) {
 			for (Articles element : sortedArticles) {
-				ArticlesDto articleDto = new ArticlesDto(element.getId(),element.getPostTitle(),element.getPostDescription(),element.getTimestamp(),element.getViews(),element.getUser());
+				ArticlesDto articleDto = new ArticlesDto(element.getId(), element.getPostTitle(),
+						element.getPostDescription(), element.getTimestamp(), element.getViews(), element.getUser());
 				articles.add(articleDto);
 			}
 		} else {
@@ -67,52 +76,49 @@ public class ArticlesService {
 		return articles;
 	}
 
-
 	public ArticlesDto getArticle(String postID) throws BusinessException {
-		Optional<Articles> optionalArticle=articleRepository.findById(postID);
-		Articles article=new Articles();
-		
-		if(optionalArticle.isPresent()) {
-			article= optionalArticle.get();
-			article.setViews(article.getViews()+1);
+		Optional<Articles> optionalArticle = articleRepository.findById(postID);
+		Articles article = new Articles();
+
+		if (optionalArticle.isPresent()) {
+			article = optionalArticle.get();
+			article.setViews(article.getViews() + 1);
 			articleRepository.save(article);
 		}
-		optionalArticle=articleRepository.findById(postID);
-		if(optionalArticle.isPresent()) {
-			article= optionalArticle.get();
+		optionalArticle = articleRepository.findById(postID);
+		if (optionalArticle.isPresent()) {
+			article = optionalArticle.get();
 		}
-		return new ArticlesDto(article.getId(),article.getPostTitle(),article.getPostDescription(),article.getTimestamp(),article.getViews(),article.getUser());
+		return new ArticlesDto(article.getId(), article.getPostTitle(), article.getPostDescription(),
+				article.getTimestamp(), article.getViews(), article.getUser());
 	}
 
-	public boolean postArticle(ArticleRequest articleRequest) throws BusinessException{
+	public boolean postArticle(ArticleRequest articleRequest) throws BusinessException {
 		Articles article = new Articles();
-		HashSet<TopicsDto> topicsList=new  HashSet<TopicsDto>();
-		
+		HashSet<TopicsDto> topicsList = new HashSet<TopicsDto>();
+
 		Users user = userRepo.findByUsername(AuthTokenFilter.currentUser);
-		
-		for(TopicsDto element:articleRequest.getTopics()) {
-			Optional<Topics> optionalTopic=topicRepository.findById(element.getId());
-			if(optionalTopic.isPresent()) {
-				topicsList.add(new TopicsDto(optionalTopic.get().getId(),optionalTopic.get().getTopicName()));
-			}
-			else {
+
+		for (TopicsDto element : articleRequest.getTopics()) {
+			Optional<Topics> optionalTopic = topicRepository.findById(element.getId());
+			if (optionalTopic.isPresent()) {
+				topicsList.add(new TopicsDto(optionalTopic.get().getId(), optionalTopic.get().getTopicName()));
+			} else {
 				throw new BusinessException("Topic not found!!");
 			}
-			
-			
+
 		}
-		
+
 		article.setPostTitle(articleRequest.getPostTitle());
 		article.setPostDescription(articleRequest.getPostDescription());
 		article.setTopics(topicsList);
-		
-		article.setUser(new UserDto(user.getId(),user.getUsername()));
-		
+
+		article.setUser(new UserDto(user.getId(), user.getUsername()));
+
 		article.setTimestamp(Instant.now().toEpochMilli());
-		
+
 		articleRepository.save(article);
 		return true;
-		
-		
+
 	}
 }

@@ -1,7 +1,9 @@
 package ai.infrrd.training.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,116 +14,116 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.payload.request.TopicFollowRequest;
-import ai.infrrd.training.payload.response.ErrorResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
-import ai.infrrd.training.payload.response.SuccessResponse;
-import ai.infrrd.training.payload.response.TopicsResponse;
 import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
+import ai.infrrd.training.service.ResponseModel;
 import ai.infrrd.training.service.TopicsService;
 import io.swagger.annotations.ApiOperation;
-
+import io.swagger.annotations.Authorization;
 
 @PreAuthorize("isAuthenticated()")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/v1")
 public class TopicsController {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(FollowersController.class);
+
+	@Autowired
+	ResponseModel responseModel;
+
 	@Autowired
 	TopicsService topicService;
-	
+
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	TopicRepository topicRepository;
-	
-	
+
 	@PostMapping("/topics/follow")
-	@ApiOperation(value="User request to follow a topic",
-	notes="Provide username and topic id to follow",
-	response=MessageResponse.class)
-	public ResponseEntity<?> followTopic(@RequestBody TopicFollowRequest topicFollowRequest) {
-		if (!userRepository.existsByUsername(topicFollowRequest.getUsername())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Username not found")));
+	@ApiOperation(value = "User request to follow a topic", notes = "Provide username and topic id to follow", authorizations = {
+			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+	public ResponseModel followTopic(@RequestBody TopicFollowRequest topicFollowRequest) throws BusinessException {
+		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
 		if (!topicRepository.existsById(topicFollowRequest.getTopicID())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Topic not found")));
+			logger.error("User to follow not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Topic Not found!!");
 		}
+
 		try {
-			topicService.followTopic(topicFollowRequest);
+			topicService.followTopic(topicFollowRequest, AuthTokenFilter.currentUser);
 		} catch (BusinessException e) {
-			e.printStackTrace();
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
+
 		}
-		return ResponseEntity.ok(new SuccessResponse(new MessageResponse("Topic followed by user")));
+		responseModel.setData("result", "Topic followed");
+		return responseModel;
 	}
-	
+
 	@PostMapping("/topics/unfollow")
-	@ApiOperation(value="User request to unfollow a topic",
-	notes="Provide username and topic id to unfollow",
-	response=MessageResponse.class)
-	public ResponseEntity<?> unfollowTopic(@RequestBody TopicFollowRequest topicFollowRequest) {
-		if (!userRepository.existsByUsername(topicFollowRequest.getUsername())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Username not found")));
+	@ApiOperation(value = "User request to unfollow a topic", notes = "Provide username and topic id to unfollow", authorizations = {
+			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+	public ResponseModel unfollowTopic(@RequestBody TopicFollowRequest topicFollowRequest) throws BusinessException {
+		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
 		if (!topicRepository.existsById(topicFollowRequest.getTopicID())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Topic not found")));
+			logger.error("User to follow not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Topic Not found!!");
 		}
 		try {
-			topicService.unfollowTopic(topicFollowRequest);
+			topicService.unfollowTopic(topicFollowRequest, AuthTokenFilter.currentUser);
 		} catch (BusinessException e) {
-			e.printStackTrace();
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
+
 		}
-		return ResponseEntity.ok(new SuccessResponse(new MessageResponse("Topic un-followed by user")));
+		responseModel.setData("result", "Topic un-followed");
+		return responseModel;
 	}
-	
-	@GetMapping("/topics/{userName}")
-	@ApiOperation(value="List of topics following",
-	notes="Username based following topics list",
-	response=MessageResponse.class)
-	public ResponseEntity<?> followTopicsList(@PathVariable String userName) {
-		if (!userRepository.existsByUsername(userName)){
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Username not found")));
+
+	@GetMapping("/topics")
+	@ApiOperation(value = "List of topics following", notes = "Username based following topics list", authorizations = {
+			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+	public ResponseModel followTopicsList() throws BusinessException {
+		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
-		
+
 		try {
-			return ResponseEntity.ok().body(new TopicsResponse(topicService.getUserTopics(userName)));
+			responseModel.setData("result", topicService.getUserTopics(AuthTokenFilter.currentUser));
+			return responseModel;
 		} catch (BusinessException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
 		}
 	}
-	
+
 	@GetMapping("/topics/auto-fill/{stringMatch}")
-	@ApiOperation(value="List of starts-with matching topics",
-	notes="Get the list of topics starts-with match",
-	response=MessageResponse.class)
-	public ResponseEntity<?> startsWith(@PathVariable String stringMatch) {
+	@ApiOperation(value = "List of starts-with matching topics", notes = "Get the list of topics starts-with match", authorizations = {
+			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+	public ResponseModel startsWith(@PathVariable String stringMatch) throws BusinessException {
 		try {
-			return ResponseEntity.ok().body(new TopicsResponse(topicService.getStringMatchTopics(stringMatch)));
+			responseModel.setData("result", topicService.getStringMatchTopics(stringMatch));
+			return responseModel;
 		} catch (BusinessException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
 		}
 	}
-	
 
 }

@@ -9,15 +9,12 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Parameters required for writing an Article")
 public class ArticleRequest {
 
-	
 	@ApiModelProperty(notes = "The Title of the Article")
 	private String postTitle;
 	@ApiModelProperty(notes = "Description of the Article")
 	private String postDescription;
 	@ApiModelProperty(notes = "Topics related to the Article")
 	private HashSet<TopicsDto> topics;
-
-	
 
 	public String getPostTitle() {
 		return postTitle;
@@ -35,7 +32,6 @@ public class ArticleRequest {
 		this.postDescription = postDescription;
 	}
 
-	
 	public HashSet<TopicsDto> getTopics() {
 		return topics;
 	}

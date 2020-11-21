@@ -1,8 +1,11 @@
 package ai.infrrd.training.controller;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,21 +22,23 @@ import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.payload.request.SignInRequest;
 import ai.infrrd.training.payload.request.SignUpRequest;
-import ai.infrrd.training.payload.response.ErrorResponse;
 import ai.infrrd.training.payload.response.MessageResponse;
 import ai.infrrd.training.payload.response.SignInResponse;
-import ai.infrrd.training.payload.response.SuccessResponse;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
 import ai.infrrd.training.security.services.UserDetailsImplementation;
+import ai.infrrd.training.service.ResponseModel;
 import ai.infrrd.training.service.SignUpService;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-@CrossOrigin(origins = "*",exposedHeaders = "${Access-Control-Expose-Headers}" , maxAge = 3600)
+@CrossOrigin(origins = "*", exposedHeaders = "${Access-Control-Expose-Headers}", maxAge = 3600)
 @RestController
 @RequestMapping("/v1")
 public class AuthenticationController {
+
+	private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+
 	@Autowired
 	AuthenticationManager authenticationManager;
 
@@ -45,66 +50,58 @@ public class AuthenticationController {
 
 	@Autowired
 	JwtUtils jwtUtils;
-	
+
 	@Autowired
 	SignUpService signUpService;
-	
+
+	@Autowired
+	ResponseModel responseModel;
+
 	@ApiIgnore
 	@GetMapping("/")
 	public String basePath() {
 		return "Tyro";
-		
+
 	}
 
 	@PostMapping("/signin")
-	@ApiOperation(value="Login to the system",
-	notes="Provide email and password to log-in",
-	response=SignInResponse.class)
-	public ResponseEntity<?> authenticateUser( @RequestBody SignInRequest signInRequest) {
+	@ApiOperation(value = "Login to the system", notes = "Provide email and password to log-in", response = SignInResponse.class)
+	public ResponseModel authenticateUser(@RequestBody SignInRequest signInRequest, HttpServletResponse response) {
 
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = jwtUtils.generateJwtToken(authentication);
-		
-		UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();		
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Bearer " + jwt);
-		return ResponseEntity.ok()
-				.headers(headers)
-				.body(new SignInResponse( 
-												 userDetails.getId(), 
-												 userDetails.getUsername(), 
-												 userDetails.getEmail()));
+
+		UserDetailsImplementation userDetails = (UserDetailsImplementation) authentication.getPrincipal();
+
+		response.addHeader("Authorization", "Bearer " + jwt);
+		responseModel.setData("result",
+				new SignInResponse(userDetails.getId(), userDetails.getUsername(), userDetails.getEmail()));
+		return responseModel;
 	}
 
 	@PostMapping("/signup")
-	@ApiOperation(value="Add a new User",
-	notes="Provide email,password and username to sign-up",
-	response=MessageResponse.class)
-	public ResponseEntity<?> registerUser(@RequestBody SignUpRequest signUpRequest) {
+	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = MessageResponse.class)
+	public ResponseModel registerUser(@RequestBody SignUpRequest signUpRequest) throws BusinessException {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Username is already taken!")));
+			logger.error("Username already taken");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Username already taken!!");
 		}
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse("Email is already in use!")));
+			logger.error("Email is already in use!");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Email is already in use!");
 		}
-		// Create new user's account
+
 		try {
-			signUpService.addUser(new UserDto(signUpRequest.getUsername(), 
-								signUpRequest.getPassword(),
-								signUpRequest.getEmail()));
+			signUpService.addUser(
+					new UserDto(signUpRequest.getUsername(), signUpRequest.getPassword(), signUpRequest.getEmail()));
 		} catch (BusinessException e) {
-			e.printStackTrace();
-			return ResponseEntity
-					.badRequest()
-					.body(new ErrorResponse(new MessageResponse(e.getMessage())));
+			logger.error(e.getMessage());
+			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
-		return ResponseEntity.ok(new SuccessResponse(new MessageResponse("User registered successfully")));
+		responseModel.setData("result", "User registered successfully");
+		return responseModel;
 	}
 }

@@ -40,20 +40,20 @@ public class TopicsService {
 		return filteredTopicsList;
 	}
 
-	public boolean followTopic(TopicFollowRequest topicFollowRequest) throws BusinessException {
+	public boolean followTopic(TopicFollowRequest topicFollowRequest, String username) throws BusinessException {
 
-		Users user = userRepo.findByUsername(topicFollowRequest.getUsername());
+		Users user = userRepo.findByUsername(username);
 
 		Optional<Topics> optionalTopic = topicRepository.findById(topicFollowRequest.getTopicID());
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
-		Topics topic=new Topics();
-		
-		if(optionalTopic.isPresent()) {
-			topic=optionalTopic.get();
-			   newUserList = topic.getUsers();
+		Topics topic = new Topics();
+
+		if (optionalTopic.isPresent()) {
+			topic = optionalTopic.get();
+			newUserList = topic.getUsers();
 		}
-		
+
 		newUserList.add(new UserDto(user.getId(), user.getUsername()));
 		topic.setUsers(newUserList);
 		topicRepository.save(topic);
@@ -72,18 +72,18 @@ public class TopicsService {
 
 	}
 
-	public boolean unfollowTopic(TopicFollowRequest topicFollowRequest) throws BusinessException {
+	public boolean unfollowTopic(TopicFollowRequest topicFollowRequest, String username) throws BusinessException {
 
-		Users user = userRepo.findByUsername(topicFollowRequest.getUsername());
+		Users user = userRepo.findByUsername(username);
 
 		Optional<Topics> optionalTopic = topicRepository.findById(topicFollowRequest.getTopicID());
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
-		Topics topic=new Topics();
-		
-		if(optionalTopic.isPresent()) {
-			topic=optionalTopic.get();
-			   newUserList = topic.getUsers();
+		Topics topic = new Topics();
+
+		if (optionalTopic.isPresent()) {
+			topic = optionalTopic.get();
+			newUserList = topic.getUsers();
 		}
 
 		if (topic.getUsers() != null) {
@@ -110,12 +110,12 @@ public class TopicsService {
 
 	}
 
-	
 	public HashSet<TopicsDto> getStringMatchTopics(String stringMatch) throws BusinessException {
 		HashSet<Topics> topicsList = topicRepository.findByTopicNameStartsWithIgnoreCase(stringMatch);
 		HashSet<TopicsDto> filteredTopicsList = new HashSet<TopicsDto>();
 		if (!topicsList.isEmpty()) {
 			for (Topics topic : topicsList) {
+				System.out.println(topic);
 				filteredTopicsList.add(new TopicsDto(topic.getId(), topic.getTopicName()));
 			}
 			return filteredTopicsList;
@@ -131,12 +131,11 @@ public class TopicsService {
 		HashSet<TopicsDto> userTopics = new HashSet<TopicsDto>();
 
 		HashSet<TopicsDto> filteredTopics = new HashSet<TopicsDto>();
-		
-		
+
 		if (allTopics.isEmpty()) {
 			throw new BusinessException("No topics in DB!!!!");
 		}
-		
+
 		if (user.getTopics() != null) {
 			userTopics = user.getTopics();
 			for (TopicsDto element : allTopics) {

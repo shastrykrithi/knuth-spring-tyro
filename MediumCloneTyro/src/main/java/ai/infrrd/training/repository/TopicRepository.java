@@ -13,9 +13,14 @@ import ai.infrrd.training.model.Topics;
 public interface TopicRepository extends MongoRepository<Topics, String> {
 
 	List<Topics> findAll();
+
 	boolean existsByTopicName(String topicName);
+
 	boolean existsById(String topicID);
+
 	Topics findByTopicName(String topicName);
+
 	Optional<Topics> findById(String topicID);
+
 	HashSet<Topics> findByTopicNameStartsWithIgnoreCase(String pattern);
 }

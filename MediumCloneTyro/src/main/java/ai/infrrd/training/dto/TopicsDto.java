@@ -3,56 +3,58 @@ package ai.infrrd.training.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class TopicsDto {
-	
+
 	private String id;
 	private String topicName;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Boolean following;
-	
+
 	public TopicsDto() {
-		super();
-		// TODO Auto-generated constructor stub
+		
 	}
+
 	public TopicsDto(String id, String topicName) {
 		super();
 		this.id = id;
 		this.topicName = topicName;
 	}
-	
-	
+
 	public TopicsDto(String id, String topicName, boolean isFollowing) {
 		super();
 		this.id = id;
 		this.topicName = topicName;
 		this.following = isFollowing;
 	}
-	
-	
+
 	public TopicsDto(String id) {
 		super();
 		this.id = id;
 	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	public String getTopicName() {
 		return topicName;
 	}
+
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
 	}
-	
 
 	public Boolean isFollowing() {
 		return following;
 	}
-	
+
 	public void setFollowing(Boolean following) {
 		this.following = following;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -61,6 +63,7 @@ public class TopicsDto {
 		result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -82,8 +85,5 @@ public class TopicsDto {
 			return false;
 		return true;
 	}
-
-	
-	
 
 }

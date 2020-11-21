@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.repository.UserRepository;
 
-
-
 @Service
 public class UserDetailsServiceImplementation implements UserDetailsService {
 	@Autowired
