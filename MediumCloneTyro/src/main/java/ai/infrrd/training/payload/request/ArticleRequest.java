@@ -2,7 +2,6 @@ package ai.infrrd.training.payload.request;
 
 import java.util.HashSet;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
