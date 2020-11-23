@@ -84,7 +84,6 @@ public class ArticlesController {
 			return responseModel;
 		} catch (BusinessException e) {
 			logger.error(e.getMessage());
-			// throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
 		}

@@ -51,6 +51,7 @@ public class TopicsService {
 
 		if (optionalTopic.isPresent()) {
 			topic = optionalTopic.get();
+			if(topic.getUsers()!=null)
 			newUserList = topic.getUsers();
 		}
 
