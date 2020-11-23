@@ -6,12 +6,14 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +61,9 @@ public class AuthenticationController {
 	@Autowired
 	ResponseModel responseModel;
 
+	@Autowired
+	MessageSource messageSource;
+
 	@ApiIgnore
 	@GetMapping("/")
 	public String basePath() {
@@ -68,7 +73,10 @@ public class AuthenticationController {
 
 	@PostMapping("/signin")
 	@ApiOperation(value = "Login to the system", notes = "Provide email and password to log-in", response = SignInResponse.class)
-	public ResponseModel authenticateUser(@RequestBody SignInRequest signInRequest, HttpServletResponse response) {
+	public ResponseModel authenticateUser(@Valid @RequestBody SignInRequest signInRequest, HttpServletResponse response,
+			BindingResult result) throws BusinessException {
+
+		validateSignInRequest(signInRequest, result);
 
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword()));
@@ -87,16 +95,15 @@ public class AuthenticationController {
 	@PostMapping("/signup")
 	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = MessageResponse.class)
 	public ResponseModel registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result)
-			throws BusinessException {
-		if (result.hasErrors()) {
-			responseModel.setData("error", result);
-//			return ResponseUtil.fieldErrorResponse("FieldError", KYCUtilities.getFieldErrorResponse(result));
-		}
+			throws BusinessException, BindException {
+
+		validateSignUpRequest(signUpRequest, result);
 
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			logger.error("Username already taken");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "Username already taken!!");
 		}
+
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			logger.error("Email is already in use!");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "Email is already in use!");
@@ -111,7 +118,32 @@ public class AuthenticationController {
 		}
 		responseModel.setData("result", "User registered successfully");
 		return responseModel;
-		// return ResponseEntity.ok().body(new MessageResponse("User Registered
-		// Successfully"));
 	}
+
+	private void validateSignUpRequest(@RequestBody @Valid SignUpRequest signUpRequest, BindingResult bindingResult)
+			throws BusinessException {
+		if (signUpRequest == null) {
+			logger.error("Empty request object");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "No details sent in the request object.");
+		}
+		if (bindingResult.hasFieldErrors()) {
+			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+		}
+	}
+
+	private void validateSignInRequest(@RequestBody @Valid SignInRequest signInRequest, BindingResult bindingResult)
+			throws BusinessException {
+		if (signInRequest == null) {
+			logger.error("Empty request object");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "No details sent in the request object.");
+		}
+		if (bindingResult.hasFieldErrors()) {
+			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+		}
+	}
+
 }

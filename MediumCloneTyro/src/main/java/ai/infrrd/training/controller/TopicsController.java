@@ -1,10 +1,13 @@
 package ai.infrrd.training.controller;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +50,10 @@ public class TopicsController {
 	@PostMapping("/topics/follow")
 	@ApiOperation(value = "User request to follow a topic", notes = "Provide username and topic id to follow", authorizations = {
 			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
-	public ResponseModel followTopic(@RequestBody TopicFollowRequest topicFollowRequest) throws BusinessException {
+	public ResponseModel followTopic(@RequestBody @Valid TopicFollowRequest topicFollowRequest, BindingResult bindingResult) throws BusinessException {
+		
+		validateRequest(topicFollowRequest, bindingResult);
+		
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -72,7 +78,10 @@ public class TopicsController {
 	@PostMapping("/topics/unfollow")
 	@ApiOperation(value = "User request to unfollow a topic", notes = "Provide username and topic id to unfollow", authorizations = {
 			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
-	public ResponseModel unfollowTopic(@RequestBody TopicFollowRequest topicFollowRequest) throws BusinessException {
+	public ResponseModel unfollowTopic(@RequestBody @Valid TopicFollowRequest topicFollowRequest, BindingResult bindingResult) throws BusinessException {
+		
+		validateRequest(topicFollowRequest,bindingResult);
+		
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -124,6 +133,20 @@ public class TopicsController {
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
 		}
+	}
+	
+	private void validateRequest(@RequestBody @Valid TopicFollowRequest topicFollowRequest, BindingResult bindingResult)
+			throws BusinessException {
+		if (topicFollowRequest == null) {
+			logger.error("Empty request object");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "No details sent in the request object.");
+		}
+		if (bindingResult.hasFieldErrors()) {
+			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+		}
+
 	}
 
 }

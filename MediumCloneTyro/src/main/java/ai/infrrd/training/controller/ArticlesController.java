@@ -112,10 +112,7 @@ public class ArticlesController {
 	public ResponseModel publishArticle(@Valid @RequestBody ArticleRequest articleRequest, BindingResult result)
 			throws BusinessException {
 
-		if (result.hasErrors()) {
-			responseModel.setData("error", result);
-			//return ResponseUtil.fieldErrorResponse("FieldError", KYCUtilities.getFieldErrorResponse(result));
-		}
+		validateRequest(articleRequest, result);
 
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
@@ -129,7 +126,19 @@ public class ArticlesController {
 		}
 		responseModel.setData("result", "Article published");
 		return responseModel;
-		//return ResponseEntity.ok().body(new MessageResponse("Article Published"));
 	}
 
+	private void validateRequest(@RequestBody @Valid ArticleRequest articleRequest, BindingResult bindingResult)
+			throws BusinessException {
+		if (articleRequest == null) {
+			logger.error("Empty request object");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "No details sent in the request object.");
+		}
+		if (bindingResult.hasFieldErrors()) {
+			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
+			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+		}
+
+	}
 }
