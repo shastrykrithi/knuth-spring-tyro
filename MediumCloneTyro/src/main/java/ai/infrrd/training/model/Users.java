@@ -2,11 +2,6 @@ package ai.infrrd.training.model;
 
 import java.util.HashSet;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,18 +16,9 @@ public class Users {
 	@Id
 	private String id;
 	@Indexed(unique = true)
-	@NotEmpty(message = "user name can not be empty")
-	@Size(min=5,max=50,message="Allowed length of username is minimum 5 and maximum 50")
-	@Pattern(regexp = "[\\S^0-9!.@?*&%#].*$",message = "Only Alphabets are allowed")
 	private String username;
-	@NotNull(message = "password can not be empty")
-	@Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[@#?!$%^&*-]).{8,}$", message = "Password atleast one uppercase, one lowercase, one number and one special character")
-	@Size(min = 8,message = "Allowed length of password is minimum 8")
 	private String password;
 	@Indexed(unique = true)
-	@NotNull(message = "email can not be null")
-	@Size(min=5, message = "email cannot be empty")
-	@Pattern(regexp = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", message = "Incorrect email pattern example@example.example")
 	private String email;
 	private HashSet<UserDto> following;
 	private HashSet<ArticlesDto> articles;

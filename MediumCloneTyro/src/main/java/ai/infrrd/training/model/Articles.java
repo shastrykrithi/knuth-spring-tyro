@@ -2,9 +2,7 @@ package ai.infrrd.training.model;
 
 import java.util.HashSet;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,11 +16,7 @@ public class Articles {
 	private String id;
 	@NotNull
 	private UserDto user;
-	@NotEmpty(message = "Post title can not be null")
-	@Size(min = 5, max = 100, message = "Allowed length is minimum 5 and maximum 100")
 	private String postTitle;
-	@NotNull(message = "Post description can not be empty")
-	@Size(min = 50, message = "Allowed length is minimum 50")
 	private String postDescription;
 	private long timestamp;
 	private int views;

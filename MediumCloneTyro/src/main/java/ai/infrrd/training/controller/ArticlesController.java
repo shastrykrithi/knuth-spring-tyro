@@ -114,6 +114,7 @@ public class ArticlesController {
 
 		if (result.hasErrors()) {
 			responseModel.setData("error", result);
+			//return ResponseUtil.fieldErrorResponse("FieldError", KYCUtilities.getFieldErrorResponse(result));
 		}
 
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
@@ -128,7 +129,7 @@ public class ArticlesController {
 		}
 		responseModel.setData("result", "Article published");
 		return responseModel;
-
+		//return ResponseEntity.ok().body(new MessageResponse("Article Published"));
 	}
 
 }

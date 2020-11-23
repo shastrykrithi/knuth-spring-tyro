@@ -86,11 +86,13 @@ public class AuthenticationController {
 
 	@PostMapping("/signup")
 	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = MessageResponse.class)
-	public ResponseModel registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result) throws BusinessException {
-		if(result.hasErrors()) {
+	public ResponseModel registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result)
+			throws BusinessException {
+		if (result.hasErrors()) {
 			responseModel.setData("error", result);
+//			return ResponseUtil.fieldErrorResponse("FieldError", KYCUtilities.getFieldErrorResponse(result));
 		}
-		
+
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			logger.error("Username already taken");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "Username already taken!!");
@@ -109,5 +111,7 @@ public class AuthenticationController {
 		}
 		responseModel.setData("result", "User registered successfully");
 		return responseModel;
+		// return ResponseEntity.ok().body(new MessageResponse("User Registered
+		// Successfully"));
 	}
 }
