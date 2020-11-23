@@ -2,13 +2,15 @@ package ai.infrrd.training.model;
 
 import java.util.HashSet;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import ai.infrrd.training.dto.TopicsDto;
 import ai.infrrd.training.dto.UserDto;
+import ai.infrrd.training.payload.request.TopicFollowRequest;
 
 @Document
 public class Articles {
@@ -16,19 +18,22 @@ public class Articles {
 	private String id;
 	@NotNull
 	private UserDto user;
-	@NotNull
+	@NotEmpty(message = "Post title can not be null")
+	@Size(min = 5, max = 100, message = "Allowed length is minimum 5 and maximum 100")
 	private String postTitle;
-	@NotNull
+	@NotNull(message = "Post description can not be empty")
+	@Size(min = 50, message = "Allowed length is minimum 50")
 	private String postDescription;
 	private long timestamp;
 	private int views;
-	private HashSet<TopicsDto> topics;
+	private HashSet<TopicFollowRequest> topics;
 
 	public Articles() {
 
 	}
 
-	public Articles(UserDto user, String postTitle, String postDescription, long timestamp, HashSet<TopicsDto> topics) {
+	public Articles(UserDto user, String postTitle, String postDescription, long timestamp,
+			HashSet<TopicFollowRequest> topics) {
 		super();
 		this.user = user;
 		this.postTitle = postTitle;
@@ -77,12 +82,12 @@ public class Articles {
 		this.timestamp = timestamp;
 	}
 
-	public HashSet<TopicsDto> getTopics() {
+	public HashSet<TopicFollowRequest> getTopics() {
 		return topics;
 	}
 
-	public void setTopics(HashSet<TopicsDto> topics) {
-		this.topics = topics;
+	public void setTopics(HashSet<TopicFollowRequest> topicsList) {
+		this.topics = topicsList;
 	}
 
 	public int getViews() {

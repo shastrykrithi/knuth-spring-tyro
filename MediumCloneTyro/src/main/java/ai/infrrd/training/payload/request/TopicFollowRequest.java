@@ -9,6 +9,15 @@ public class TopicFollowRequest {
 	@ApiModelProperty(notes = "The topic name")
 	private String topicID;
 
+	public TopicFollowRequest() {
+
+	}
+
+	public TopicFollowRequest(String topicID) {
+		super();
+		this.topicID = topicID;
+	}
+
 	public String getTopicID() {
 		return topicID;
 	}

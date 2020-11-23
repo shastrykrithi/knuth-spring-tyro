@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ai.infrrd.training.dto.ArticlesDto;
-import ai.infrrd.training.dto.TopicsDto;
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.filter.AuthTokenFilter;
@@ -19,6 +18,7 @@ import ai.infrrd.training.model.Articles;
 import ai.infrrd.training.model.Topics;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.ArticleRequest;
+import ai.infrrd.training.payload.request.TopicFollowRequest;
 import ai.infrrd.training.repository.ArticleRepository;
 import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
@@ -95,14 +95,14 @@ public class ArticlesService {
 
 	public boolean postArticle(ArticleRequest articleRequest) throws BusinessException {
 		Articles article = new Articles();
-		HashSet<TopicsDto> topicsList = new HashSet<TopicsDto>();
+		HashSet<TopicFollowRequest> topicsList = new HashSet<TopicFollowRequest>();
 
 		Users user = userRepo.findByUsername(AuthTokenFilter.currentUser);
 
-		for (TopicsDto element : articleRequest.getTopics()) {
-			Optional<Topics> optionalTopic = topicRepository.findById(element.getId());
+		for (TopicFollowRequest element : articleRequest.getTopics()) {
+			Optional<Topics> optionalTopic = topicRepository.findById(element.getTopicID());
 			if (optionalTopic.isPresent()) {
-				topicsList.add(new TopicsDto(optionalTopic.get().getId(), optionalTopic.get().getTopicName()));
+				topicsList.add(new TopicFollowRequest(optionalTopic.get().getId()));
 			} else {
 				throw new BusinessException("Topic not found!!");
 			}

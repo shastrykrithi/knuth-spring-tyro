@@ -2,7 +2,6 @@ package ai.infrrd.training.payload.request;
 
 import java.util.HashSet;
 
-import ai.infrrd.training.dto.TopicsDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -14,7 +13,7 @@ public class ArticleRequest {
 	@ApiModelProperty(notes = "Description of the Article")
 	private String postDescription;
 	@ApiModelProperty(notes = "Topics related to the Article")
-	private HashSet<TopicsDto> topics;
+	private HashSet<TopicFollowRequest> topics;
 
 	public String getPostTitle() {
 		return postTitle;
@@ -32,11 +31,11 @@ public class ArticleRequest {
 		this.postDescription = postDescription;
 	}
 
-	public HashSet<TopicsDto> getTopics() {
+	public HashSet<TopicFollowRequest> getTopics() {
 		return topics;
 	}
 
-	public void setTopics(HashSet<TopicsDto> topics) {
+	public void setTopics(HashSet<TopicFollowRequest> topics) {
 		this.topics = topics;
 	}
 

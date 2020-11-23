@@ -2,11 +2,14 @@ package ai.infrrd.training.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -106,7 +109,13 @@ public class ArticlesController {
 	@PostMapping("/publish")
 	@ApiOperation(value = "Publish the Article", notes = "Write the Post with title and description", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ArticleResponse.class)
-	public ResponseModel publishArticle(@RequestBody ArticleRequest articleRequest) throws BusinessException {
+	public ResponseModel publishArticle(@Valid @RequestBody ArticleRequest articleRequest, BindingResult result)
+			throws BusinessException {
+
+		if (result.hasErrors()) {
+			responseModel.setData("error", result);
+		}
+
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");

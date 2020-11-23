@@ -1,6 +1,7 @@
 package ai.infrrd.training.controller;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,7 +86,11 @@ public class AuthenticationController {
 
 	@PostMapping("/signup")
 	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = MessageResponse.class)
-	public ResponseModel registerUser(@RequestBody SignUpRequest signUpRequest) throws BusinessException {
+	public ResponseModel registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result) throws BusinessException {
+		if(result.hasErrors()) {
+			responseModel.setData("error", result);
+		}
+		
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			logger.error("Username already taken");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "Username already taken!!");

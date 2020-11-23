@@ -2,6 +2,9 @@ package ai.infrrd.training.model;
 
 import java.util.HashSet;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,6 +18,8 @@ public class Topics {
 	@Id
 	private String id;
 	@Indexed(unique = true)
+	@NotNull(message = "topics name can not be null")
+	@Size(min=3, message = "Allowed length is minimum 3")
 	private String topicName;
 	private HashSet<UserDto> users;
 	private HashSet<ArticlesDto> articles;
