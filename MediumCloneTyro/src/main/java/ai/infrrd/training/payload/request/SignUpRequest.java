@@ -13,7 +13,7 @@ public class SignUpRequest {
 	@ApiModelProperty(notes = "Unique username")
 	@NotNull(message = "user name can not be empty")
 	@Size(min = 5, max = 50, message = "Allowed length of username is minimum 5 and maximum 50")
-	@Pattern(regexp = "[\\S^0-9!.@?*&%#].*$", message = "Only Alphabets are allowed")
+	@Pattern(regexp = "^[A-Za-z]+[A-Za-z0-9]*$", message = "Special Characters are not allowed")
 	private String username;
 	@ApiModelProperty(notes = "Unique email")
 	@NotNull(message = "email can not be null")
