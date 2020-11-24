@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.payload.request.TopicFollowRequest;
 import ai.infrrd.training.payload.response.MessageResponse;
@@ -65,7 +66,7 @@ public class TopicsController {
 
 		try {
 			topicService.followTopic(topicFollowRequest, AuthTokenFilter.currentUser);
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -92,7 +93,7 @@ public class TopicsController {
 		}
 		try {
 			topicService.unfollowTopic(topicFollowRequest, AuthTokenFilter.currentUser);
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -114,7 +115,7 @@ public class TopicsController {
 		try {
 			responseModel.setData("result", topicService.getUserTopics(AuthTokenFilter.currentUser));
 			return responseModel;
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -128,7 +129,7 @@ public class TopicsController {
 		try {
 			responseModel.setData("result", topicService.getStringMatchTopics(stringMatch));
 			return responseModel;
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -144,7 +145,7 @@ public class TopicsController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST,  "Invalid arguments");
 		}
 
 	}

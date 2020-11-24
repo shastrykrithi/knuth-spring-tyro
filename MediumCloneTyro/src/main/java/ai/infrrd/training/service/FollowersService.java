@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.FollowerRequest;
 import ai.infrrd.training.repository.FollowerRepository;
@@ -23,7 +24,7 @@ public class FollowersService {
 	@Autowired
 	UserRepository userRepo;
 
-	public HashSet<UserDto> getAllFollowers() throws BusinessException {
+	public HashSet<UserDto> getAllFollowers() throws MessageException {
 
 		HashSet<UserDto> filteredfollowerList = new HashSet<UserDto>();
 		List<Users> allfollowerList = followerRepository.findAll();
@@ -33,12 +34,12 @@ public class FollowersService {
 				filteredfollowerList.add(userDto);
 			}
 		} else {
-			throw new BusinessException("User list is empty");
+			throw new MessageException("User list is empty");
 		}
 		return filteredfollowerList;
 	}
 
-	public HashSet<UserDto> getUserFollowers(String username) throws BusinessException {
+	public HashSet<UserDto> getUserFollowers(String username) throws MessageException {
 		Users user = userRepo.findByUsername(username);
 		HashSet<UserDto> allUsers = getAllFollowers();
 		HashSet<UserDto> userFollowers = new HashSet<UserDto>();
@@ -46,7 +47,7 @@ public class FollowersService {
 		HashSet<UserDto> filteredFollowers = new HashSet<UserDto>();
 
 		if (allUsers.isEmpty()) {
-			throw new BusinessException("No Users in DB!!!!");
+			throw new MessageException("No Users in DB!!!!");
 		}
 
 		if (user.getFollowing() != null) {
@@ -79,7 +80,7 @@ public class FollowersService {
 
 	}
 
-	public boolean followUser(FollowerRequest followerRequest, String username) throws BusinessException {
+	public boolean followUser(FollowerRequest followerRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
@@ -101,7 +102,7 @@ public class FollowersService {
 		return true;
 	}
 
-	public boolean unfollowUser(FollowerRequest followerRequest, String username) throws BusinessException {
+	public boolean unfollowUser(FollowerRequest followerRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
@@ -118,7 +119,7 @@ public class FollowersService {
 				user.setFollowing(newUserList);
 				userRepo.save(user);
 			} else {
-				new BusinessException("User is not following anyone yet!!!!");
+				new MessageException("User is not following anyone yet!!!!");
 			}
 		}
 		return true;

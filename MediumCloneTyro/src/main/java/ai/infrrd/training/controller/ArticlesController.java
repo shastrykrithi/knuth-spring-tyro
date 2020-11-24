@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.infrrd.training.dto.ArticlesDto;
 import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.payload.request.ArticleRequest;
 import ai.infrrd.training.payload.response.ArticleResponse;
@@ -68,7 +69,7 @@ public class ArticlesController {
 			ArticlesDto article = articleService.getArticle(postID);
 			responseModel.setData("result", article);
 			return responseModel;
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -85,7 +86,7 @@ public class ArticlesController {
 		try {
 			responseModel.setData("result", articleService.getAllArticles(AuthTokenFilter.currentUser));
 			return responseModel;
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -100,7 +101,7 @@ public class ArticlesController {
 			List<ArticlesDto> articleList = articleService.getTrendingArticles();
 			responseModel.setData("result", articleList);
 			return responseModel;
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -120,7 +121,7 @@ public class ArticlesController {
 		}
 		try {
 			articleService.postArticle(articleRequest);
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -137,7 +138,7 @@ public class ArticlesController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST,  "Invalid arguments");
 		}
 
 	}

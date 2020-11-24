@@ -95,7 +95,7 @@ public class AuthenticationController {
 	@PostMapping("/signup")
 	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = MessageResponse.class)
 	public ResponseModel registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result)
-			throws BusinessException, BindException {
+			throws BusinessException{
 
 		validateSignUpRequest(signUpRequest, result);
 
@@ -129,7 +129,7 @@ public class AuthenticationController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid arguments");
 		}
 	}
 
@@ -142,7 +142,7 @@ public class AuthenticationController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid arguments");
 		}
 	}
 

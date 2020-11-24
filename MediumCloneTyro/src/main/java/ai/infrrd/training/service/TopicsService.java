@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ai.infrrd.training.dto.TopicsDto;
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.model.Topics;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.TopicFollowRequest;
@@ -25,7 +26,7 @@ public class TopicsService {
 	@Autowired
 	UserRepository userRepo;
 
-	public HashSet<TopicsDto> getAllTopics() throws BusinessException {
+	public HashSet<TopicsDto> getAllTopics() throws MessageException {
 
 		HashSet<TopicsDto> filteredTopicsList = new HashSet<TopicsDto>();
 		List<Topics> allTopicsList = topicRepository.findAll();
@@ -35,12 +36,12 @@ public class TopicsService {
 				filteredTopicsList.add(topicDto);
 			}
 		} else {
-			throw new BusinessException("Topics list is empty");
+			throw new MessageException("Topics list is empty");
 		}
 		return filteredTopicsList;
 	}
 
-	public boolean followTopic(TopicFollowRequest topicFollowRequest, String username) throws BusinessException {
+	public boolean followTopic(TopicFollowRequest topicFollowRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
@@ -73,7 +74,7 @@ public class TopicsService {
 
 	}
 
-	public boolean unfollowTopic(TopicFollowRequest topicFollowRequest, String username) throws BusinessException {
+	public boolean unfollowTopic(TopicFollowRequest topicFollowRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
@@ -93,7 +94,7 @@ public class TopicsService {
 			topic.setUsers(newUserList);
 			topicRepository.save(topic);
 		} else {
-			new BusinessException("No users following the topic yet!!");
+			new MessageException("No users following the topic yet!!");
 		}
 
 		HashSet<TopicsDto> newtopicList = new HashSet<TopicsDto>();
@@ -104,14 +105,14 @@ public class TopicsService {
 			user.setTopics(newtopicList);
 			userRepo.save(user);
 		} else {
-			new BusinessException("No topics followed by user yet!!");
+			new MessageException("No topics followed by user yet!!");
 		}
 
 		return true;
 
 	}
 
-	public HashSet<TopicsDto> getStringMatchTopics(String stringMatch) throws BusinessException {
+	public HashSet<TopicsDto> getStringMatchTopics(String stringMatch) throws MessageException {
 		HashSet<Topics> topicsList = topicRepository.findByTopicNameStartsWithIgnoreCase(stringMatch);
 		HashSet<TopicsDto> filteredTopicsList = new HashSet<TopicsDto>();
 		if (!topicsList.isEmpty()) {
@@ -121,12 +122,12 @@ public class TopicsService {
 			}
 			return filteredTopicsList;
 		} else {
-			throw new BusinessException("No matching topics found");
+			throw new MessageException("No matching topics found");
 		}
 
 	}
 
-	public HashSet<TopicsDto> getUserTopics(String username) throws BusinessException {
+	public HashSet<TopicsDto> getUserTopics(String username) throws MessageException {
 		Users user = userRepo.findByUsername(username);
 		HashSet<TopicsDto> allTopics = getAllTopics();
 		HashSet<TopicsDto> userTopics = new HashSet<TopicsDto>();
@@ -134,7 +135,7 @@ public class TopicsService {
 		HashSet<TopicsDto> filteredTopics = new HashSet<TopicsDto>();
 
 		if (allTopics.isEmpty()) {
-			throw new BusinessException("No topics in DB!!!!");
+			throw new MessageException("No topics in DB!!!!");
 		}
 
 		if (user.getTopics() != null) {

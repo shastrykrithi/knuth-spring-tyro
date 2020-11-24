@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.payload.request.FollowerRequest;
 import ai.infrrd.training.payload.response.MessageResponse;
@@ -63,7 +64,7 @@ public class FollowersController {
 		}
 		try {
 			followersService.followUser(followerRequest, AuthTokenFilter.currentUser);
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -90,7 +91,7 @@ public class FollowersController {
 		}
 		try {
 			followersService.unfollowUser(followerRequest, AuthTokenFilter.currentUser);
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -111,7 +112,7 @@ public class FollowersController {
 		try {
 			responseModel.setData("result", followersService.getUserFollowers(AuthTokenFilter.currentUser));
 			return responseModel;
-		} catch (BusinessException e) {
+		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			responseModel.setData("error", e.getMessage());
 			return responseModel;
@@ -127,7 +128,7 @@ public class FollowersController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST, errorMessage);
+			throw new BusinessException(HttpStatus.BAD_REQUEST,  "Invalid arguments");
 		}
 
 	}

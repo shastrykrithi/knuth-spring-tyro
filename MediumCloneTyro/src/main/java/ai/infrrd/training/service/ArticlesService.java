@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import ai.infrrd.training.dto.ArticlesDto;
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.model.Articles;
 import ai.infrrd.training.model.Topics;
@@ -35,7 +36,7 @@ public class ArticlesService {
 	@Autowired
 	TopicRepository topicRepository;
 
-	public List<ArticlesDto> getAllArticles(String username) throws BusinessException {
+	public List<ArticlesDto> getAllArticles(String username) throws MessageException {
 		HashSet<UserDto> followers = userRepo.findByUsername(username).getFollowing();
 		List<ArticlesDto> recentArticlesList = new ArrayList<ArticlesDto>();
 
@@ -45,21 +46,21 @@ public class ArticlesService {
 					recentArticlesList.addAll(articleRepository.findByUserName(element.getUsername()));
 				}
 			} else
-				throw new BusinessException("User is not following anyone yet!!!");
+				throw new MessageException("User is not following anyone yet!!!");
 
 		} else {
-			throw new BusinessException("User is not following anyone yet!!!");
+			throw new MessageException("User is not following anyone yet!!!");
 		}
 		if (!recentArticlesList.isEmpty()) {
 			Collections.sort(recentArticlesList);
 		} else {
-			throw new BusinessException("No articles in feed yet!!!");
+			throw new MessageException("No articles in feed yet!!!");
 		}
 
 		return recentArticlesList;
 	}
 
-	public List<ArticlesDto> getTrendingArticles() throws BusinessException {
+	public List<ArticlesDto> getTrendingArticles() throws MessageException {
 
 		List<ArticlesDto> articles = new ArrayList<ArticlesDto>();
 		List<Articles> sortedArticles = articleRepository.findTop4ByOrderByViewsDesc();
@@ -71,12 +72,12 @@ public class ArticlesService {
 				articles.add(articleDto);
 			}
 		} else {
-			throw new BusinessException("Articles list is empty");
+			throw new MessageException("Articles list is empty");
 		}
 		return articles;
 	}
 
-	public ArticlesDto getArticle(String postID) throws BusinessException {
+	public ArticlesDto getArticle(String postID) throws MessageException {
 		Optional<Articles> optionalArticle = articleRepository.findById(postID);
 		Articles article = new Articles();
 
@@ -93,7 +94,7 @@ public class ArticlesService {
 				article.getTimestamp(), article.getViews(), article.getUser());
 	}
 
-	public boolean postArticle(ArticleRequest articleRequest) throws BusinessException {
+	public boolean postArticle(ArticleRequest articleRequest) throws MessageException {
 		Articles article = new Articles();
 		HashSet<TopicFollowRequest> topicsList = new HashSet<TopicFollowRequest>();
 
@@ -104,7 +105,7 @@ public class ArticlesService {
 			if (optionalTopic.isPresent()) {
 				topicsList.add(new TopicFollowRequest(optionalTopic.get().getId()));
 			} else {
-				throw new BusinessException("Topic not found!!");
+				throw new MessageException("Topic not found!!");
 			}
 
 		}
