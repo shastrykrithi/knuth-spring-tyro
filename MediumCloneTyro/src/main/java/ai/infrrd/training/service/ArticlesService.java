@@ -7,19 +7,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ai.infrrd.training.dto.ArticlesDto;
 import ai.infrrd.training.dto.UserDto;
-import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.model.Articles;
 import ai.infrrd.training.model.Topics;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.ArticleRequest;
-import ai.infrrd.training.payload.request.TopicFollowRequest;
+import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.ArticleRepository;
 import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
@@ -77,9 +78,17 @@ public class ArticlesService {
 		return articles;
 	}
 
-	public ArticlesDto getArticle(String postID) throws MessageException {
+	public ArticlesDto getArticle(String postID,String username) throws MessageException {
+		boolean isLiked=false;
+		boolean isBookmarked=false;
+		
 		Optional<Articles> optionalArticle = articleRepository.findById(postID);
+		Users user = userRepo.findByUsername(username);
+		
+		
+		HashSet<String> list = new HashSet<String>();
 		Articles article = new Articles();
+		
 
 		if (optionalArticle.isPresent()) {
 			article = optionalArticle.get();
@@ -90,20 +99,36 @@ public class ArticlesService {
 		if (optionalArticle.isPresent()) {
 			article = optionalArticle.get();
 		}
+		
+		if (user.getBookmarks() != null) {
+			list = user.getBookmarks();
+			if(list.contains(article.getId())) {
+				isBookmarked=true;	
+			}
+		}
+		
+		if (user.getLiked()!= null) {
+			list = user.getLiked();
+			if(list.contains(article.getId())) {
+				isLiked=true;	
+			}
+		}
+		
+		
 		return new ArticlesDto(article.getId(), article.getPostTitle(), article.getPostDescription(),
-				article.getTimestamp(), article.getViews(), article.getUser());
+				article.getTimestamp(), article.getViews(), isBookmarked,isLiked,article.getUser());
 	}
 
 	public boolean postArticle(ArticleRequest articleRequest) throws MessageException {
 		Articles article = new Articles();
-		HashSet<TopicFollowRequest> topicsList = new HashSet<TopicFollowRequest>();
+		HashSet<IDRequestModel> topicsList = new HashSet<IDRequestModel>();
 
 		Users user = userRepo.findByUsername(AuthTokenFilter.currentUser);
 
-		for (TopicFollowRequest element : articleRequest.getTopics()) {
-			Optional<Topics> optionalTopic = topicRepository.findById(element.getTopicID());
+		for (IDRequestModel element : articleRequest.getTopics()) {
+			Optional<Topics> optionalTopic = topicRepository.findById(element.getId());
 			if (optionalTopic.isPresent()) {
-				topicsList.add(new TopicFollowRequest(optionalTopic.get().getId()));
+				topicsList.add(new IDRequestModel(optionalTopic.get().getId()));
 			} else {
 				throw new MessageException("Topic not found!!");
 			}
@@ -119,7 +144,159 @@ public class ArticlesService {
 		article.setTimestamp(Instant.now().toEpochMilli());
 
 		articleRepository.save(article);
+
 		return true;
 
 	}
+
+	public boolean bookmarkArticle(IDRequestModel idRequestModel, String currentUser) throws MessageException {
+		Articles article = new Articles();
+		HashSet<String> bookmarkList = new HashSet<String>();
+
+		Optional<Articles> optionalArticle = articleRepository.findById(idRequestModel.getId());
+
+		if (optionalArticle.isPresent()) {
+			article = optionalArticle.get();
+			article.setBookmarkCount(article.getBookmarkCount() + 1);
+			articleRepository.save(article);
+		}
+
+		Users user = userRepo.findByUsername(currentUser);
+
+		if (user.getBookmarks() != null) {
+			bookmarkList = user.getBookmarks();
+		}
+		bookmarkList.add(idRequestModel.getId());
+		user.setBookmarks(bookmarkList);
+		userRepo.save(user);
+		return true;
+
+	}
+
+	public boolean likeArticle(IDRequestModel idRequestModel, String currentUser) throws MessageException {
+		Articles article = new Articles();
+		HashSet<String> likedList = new HashSet<String>();
+
+		Optional<Articles> optionalArticle = articleRepository.findById(idRequestModel.getId());
+
+		if (optionalArticle.isPresent()) {
+			article = optionalArticle.get();
+			article.setLikes(article.getLikes() + 1);
+			articleRepository.save(article);
+		}
+
+		Users user = userRepo.findByUsername(currentUser);
+
+		if (user.getLiked() != null) {
+			likedList = user.getLiked();
+		}
+		likedList.add(idRequestModel.getId());
+		user.setLiked(likedList);
+		userRepo.save(user);
+		return true;
+
+	}
+
+	public List<ArticlesDto> getUserBookMarks(String currentUser) throws MessageException {
+
+		List<ArticlesDto> articles = new ArrayList<ArticlesDto>();
+		HashSet<String> bookmarkList = new HashSet<String>();
+		Articles articleInfo = new Articles();
+
+		Users user = userRepo.findByUsername(currentUser);
+
+		if (user.getBookmarks() != null) {
+			bookmarkList = user.getBookmarks();
+			if(!bookmarkList.isEmpty()) {
+				for (String article : bookmarkList) {
+					Optional<Articles> optionalArticle = articleRepository.findById(article);
+					if (optionalArticle.isPresent()) {
+						articleInfo = optionalArticle.get();
+						articles.add(new ArticlesDto(articleInfo.getId(), articleInfo.getPostTitle(),
+								articleInfo.getPostDescription(), articleInfo.getTimestamp(), articleInfo.getUser()));
+					}
+
+				}
+			}else {
+				throw new MessageException("No added user bookmarks!!!");
+			}
+			
+		} else {
+			throw new MessageException("No added user bookmarks!!!");
+		}
+
+		return articles;
+	}
+
+	public boolean removeBookmark(@Valid IDRequestModel idRequestModel, String currentUser) throws MessageException{
+		Articles article = new Articles();
+		HashSet<String> bookmarkList = new HashSet<String>();
+
+		Optional<Articles> optionalArticle = articleRepository.findById(idRequestModel.getId());
+
+		if (optionalArticle.isPresent()) {
+			article = optionalArticle.get();
+			if (article.getBookmarkCount() > 0) {
+				article.setBookmarkCount(article.getBookmarkCount() - 1);
+				articleRepository.save(article);
+			} else {
+				throw new MessageException("No bookmarks for this article!!");
+
+			}
+		}
+			
+
+		Users user = userRepo.findByUsername(currentUser);
+
+		if (user.getBookmarks() != null) {
+			bookmarkList = user.getBookmarks();
+			bookmarkList.remove(idRequestModel.getId());
+			user.setBookmarks(bookmarkList);
+			userRepo.save(user);
+		}
+		else {
+			throw new MessageException("User not having any bookmarks!!!");
+
+		}
+		
+		return true;
+
+	}
+	
+	public boolean unlikeArticle(@Valid IDRequestModel idRequestModel, String currentUser) throws MessageException{
+		Articles article = new Articles();
+		HashSet<String> likesList = new HashSet<String>();
+
+		Optional<Articles> optionalArticle = articleRepository.findById(idRequestModel.getId());
+
+		if (optionalArticle.isPresent()) {
+			article = optionalArticle.get();
+			if (article.getLikes() > 0) {
+				article.setLikes(article.getLikes() - 1);
+				articleRepository.save(article);
+			} else {
+				throw new MessageException("No likes for this article!!");
+
+			}
+		}
+			
+
+		Users user = userRepo.findByUsername(currentUser);
+
+		if (user.getLiked() != null) {
+			likesList = user.getLiked();
+			likesList.remove(idRequestModel.getId());
+			user.setLiked(likesList);
+			userRepo.save(user);
+		}
+		else {
+			throw new MessageException("User not at liked any posts!!!");
+
+		}
+		
+		return true;
+
+	}
+	
+	
 }

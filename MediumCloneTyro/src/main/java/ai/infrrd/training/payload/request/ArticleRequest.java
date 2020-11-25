@@ -20,7 +20,7 @@ public class ArticleRequest {
 	@Size(min = 10, message = "Post description allowed length is minimum 10")
 	private String postDescription;
 	@ApiModelProperty(notes = "Topics related to the Article")
-	private HashSet<TopicFollowRequest> topics;
+	private HashSet<IDRequestModel> topics;
 
 	public String getPostTitle() {
 		return postTitle;
@@ -38,11 +38,11 @@ public class ArticleRequest {
 		this.postDescription = postDescription;
 	}
 
-	public HashSet<TopicFollowRequest> getTopics() {
+	public HashSet<IDRequestModel> getTopics() {
 		return topics;
 	}
 
-	public void setTopics(HashSet<TopicFollowRequest> topics) {
+	public void setTopics(HashSet<IDRequestModel> topics) {
 		this.topics = topics;
 	}
 

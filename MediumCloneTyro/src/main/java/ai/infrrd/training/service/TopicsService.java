@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 
 import ai.infrrd.training.dto.TopicsDto;
 import ai.infrrd.training.dto.UserDto;
-import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.model.Topics;
 import ai.infrrd.training.model.Users;
-import ai.infrrd.training.payload.request.TopicFollowRequest;
+import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
 
@@ -41,11 +40,11 @@ public class TopicsService {
 		return filteredTopicsList;
 	}
 
-	public boolean followTopic(TopicFollowRequest topicFollowRequest, String username) throws MessageException {
+	public boolean followTopic(IDRequestModel topicFollowRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
-		Optional<Topics> optionalTopic = topicRepository.findById(topicFollowRequest.getTopicID());
+		Optional<Topics> optionalTopic = topicRepository.findById(topicFollowRequest.getId());
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
 		Topics topic = new Topics();
@@ -74,11 +73,11 @@ public class TopicsService {
 
 	}
 
-	public boolean unfollowTopic(TopicFollowRequest topicFollowRequest, String username) throws MessageException {
+	public boolean unfollowTopic(IDRequestModel topicFollowRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
-		Optional<Topics> optionalTopic = topicRepository.findById(topicFollowRequest.getTopicID());
+		Optional<Topics> optionalTopic = topicRepository.findById(topicFollowRequest.getId());
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
 		Topics topic = new Topics();

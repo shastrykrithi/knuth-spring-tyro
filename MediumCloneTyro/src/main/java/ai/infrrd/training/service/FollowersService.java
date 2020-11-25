@@ -8,10 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ai.infrrd.training.dto.UserDto;
-import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.model.Users;
-import ai.infrrd.training.payload.request.FollowerRequest;
+import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.FollowerRepository;
 import ai.infrrd.training.repository.UserRepository;
 
@@ -80,11 +79,11 @@ public class FollowersService {
 
 	}
 
-	public boolean followUser(FollowerRequest followerRequest, String username) throws MessageException {
+	public boolean followUser(IDRequestModel followerRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
-		Optional<Users> optionalUser = userRepo.findById(followerRequest.getFollowRequestID());
+		Optional<Users> optionalUser = userRepo.findById(followerRequest.getId());
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
 		Users followUser = new Users();
@@ -102,11 +101,11 @@ public class FollowersService {
 		return true;
 	}
 
-	public boolean unfollowUser(FollowerRequest followerRequest, String username) throws MessageException {
+	public boolean unfollowUser(IDRequestModel followerRequest, String username) throws MessageException {
 
 		Users user = userRepo.findByUsername(username);
 
-		Optional<Users> optionalUser = userRepo.findById(followerRequest.getFollowRequestID());
+		Optional<Users> optionalUser = userRepo.findById(followerRequest.getId());
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
 		Users followUser = new Users();

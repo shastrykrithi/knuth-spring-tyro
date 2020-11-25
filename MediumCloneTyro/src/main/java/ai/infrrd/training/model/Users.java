@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import ai.infrrd.training.dto.ArticlesDto;
 import ai.infrrd.training.dto.TopicsDto;
 import ai.infrrd.training.dto.UserDto;
 
@@ -21,8 +20,10 @@ public class Users {
 	@Indexed(unique = true)
 	private String email;
 	private HashSet<UserDto> following;
-	private HashSet<ArticlesDto> articles;
+	private HashSet<String> publishedArticles;
 	private HashSet<TopicsDto> topics;
+	private HashSet<String> bookmarks;
+	private HashSet<String> liked;
 
 	public Users() {
 
@@ -75,12 +76,12 @@ public class Users {
 		this.following = following;
 	}
 
-	public HashSet<ArticlesDto> getArticles() {
-		return articles;
+	public HashSet<String> getArticles() {
+		return publishedArticles;
 	}
 
-	public void setArticles(HashSet<ArticlesDto> articles) {
-		this.articles = articles;
+	public void setArticles(HashSet<String> publishedArticles) {
+		this.publishedArticles = publishedArticles;
 	}
 
 	public HashSet<TopicsDto> getTopics() {
@@ -90,12 +91,30 @@ public class Users {
 	public void setTopics(HashSet<TopicsDto> topics) {
 		this.topics = topics;
 	}
+	
+	
+	public HashSet<String> getBookmarks() {
+		return bookmarks;
+	}
+
+	public void setBookmarks(HashSet<String> bookmarks) {
+		this.bookmarks = bookmarks;
+	}
+	
+
+	public HashSet<String> getLiked() {
+		return liked;
+	}
+
+	public void setLiked(HashSet<String> liked) {
+		this.liked = liked;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((articles == null) ? 0 : articles.hashCode());
+		result = prime * result + ((publishedArticles == null) ? 0 : publishedArticles.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + ((following == null) ? 0 : following.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
@@ -114,10 +133,10 @@ public class Users {
 		if (getClass() != obj.getClass())
 			return false;
 		Users other = (Users) obj;
-		if (articles == null) {
-			if (other.articles != null)
+		if (publishedArticles == null) {
+			if (other.publishedArticles != null)
 				return false;
-		} else if (!articles.equals(other.articles))
+		} else if (!publishedArticles.equals(other.publishedArticles))
 			return false;
 		if (email == null) {
 			if (other.email != null)

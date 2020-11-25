@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
-import ai.infrrd.training.payload.request.FollowerRequest;
-import ai.infrrd.training.payload.response.MessageResponse;
+import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.FollowerRepository;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.service.FollowersService;
@@ -49,8 +48,8 @@ public class FollowersController {
 
 	@PostMapping("/people/follow")
 	@ApiOperation(value = "User request to follow a user", notes = "Provide username and user id to follow", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
-	public ResponseModel followTopic(@RequestBody @Valid FollowerRequest followerRequest, BindingResult bindingResult) throws BusinessException {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel followTopic(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult) throws BusinessException {
 		
 		validateRequest(followerRequest,bindingResult);
 		
@@ -58,7 +57,7 @@ public class FollowersController {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
-		if (!userRepository.existsById(followerRequest.getFollowRequestID())) {
+		if (!userRepository.existsById(followerRequest.getId())) {
 			logger.error("User to follow not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User to follow not found");
 		}
@@ -76,8 +75,8 @@ public class FollowersController {
 
 	@PostMapping("/people/unfollow")
 	@ApiOperation(value = "User request to unfollow a user", notes = "Provide username and user id to unfollow", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
-	public ResponseModel unfollowTopic(@RequestBody @Valid FollowerRequest followerRequest, BindingResult bindingResult) throws BusinessException {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel unfollowTopic(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult) throws BusinessException {
 		
 		validateRequest(followerRequest,bindingResult);
 		
@@ -85,7 +84,7 @@ public class FollowersController {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
-		if (!userRepository.existsById(followerRequest.getFollowRequestID())) {
+		if (!userRepository.existsById(followerRequest.getId())) {
 			logger.error("User to follow not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User to un-follow not found");
 		}
@@ -103,7 +102,7 @@ public class FollowersController {
 
 	@GetMapping("/people")
 	@ApiOperation(value = "List of followers", notes = "Username based following followers list", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel followerList() throws BusinessException {
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
@@ -119,7 +118,7 @@ public class FollowersController {
 		}
 	}
 	
-	private void validateRequest(@RequestBody @Valid FollowerRequest followerRequest, BindingResult bindingResult)
+	private void validateRequest(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult)
 			throws BusinessException {
 		if (followerRequest == null) {
 			logger.error("Empty request object");

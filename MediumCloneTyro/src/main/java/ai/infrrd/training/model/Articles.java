@@ -8,7 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import ai.infrrd.training.dto.UserDto;
-import ai.infrrd.training.payload.request.TopicFollowRequest;
+import ai.infrrd.training.payload.request.IDRequestModel;
+
 
 @Document
 public class Articles {
@@ -20,14 +21,16 @@ public class Articles {
 	private String postDescription;
 	private long timestamp;
 	private int views;
-	private HashSet<TopicFollowRequest> topics;
+	private int likes;
+	private int bookmarkCount;
+	private HashSet<IDRequestModel> topics;
 
 	public Articles() {
 
 	}
 
 	public Articles(UserDto user, String postTitle, String postDescription, long timestamp,
-			HashSet<TopicFollowRequest> topics) {
+			HashSet<IDRequestModel> topics) {
 		super();
 		this.user = user;
 		this.postTitle = postTitle;
@@ -76,11 +79,11 @@ public class Articles {
 		this.timestamp = timestamp;
 	}
 
-	public HashSet<TopicFollowRequest> getTopics() {
+	public HashSet<IDRequestModel> getTopics() {
 		return topics;
 	}
 
-	public void setTopics(HashSet<TopicFollowRequest> topicsList) {
+	public void setTopics(HashSet<IDRequestModel> topicsList) {
 		this.topics = topicsList;
 	}
 
@@ -90,6 +93,22 @@ public class Articles {
 
 	public void setViews(int views) {
 		this.views = views;
+	}
+	
+	public int getLikes() {
+		return likes;
+	}
+
+	public void setLikes(int likes) {
+		this.likes = likes;
+	}
+
+	public int getBookmarkCount() {
+		return bookmarkCount;
+	}
+
+	public void setBookmarkCount(int bookmarkCount) {
+		this.bookmarkCount = bookmarkCount;
 	}
 
 	@Override

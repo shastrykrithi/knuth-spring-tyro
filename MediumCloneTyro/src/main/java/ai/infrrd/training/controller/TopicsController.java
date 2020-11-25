@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
-import ai.infrrd.training.payload.request.TopicFollowRequest;
-import ai.infrrd.training.payload.response.MessageResponse;
+import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.service.ResponseModel;
@@ -50,8 +49,8 @@ public class TopicsController {
 
 	@PostMapping("/topics/follow")
 	@ApiOperation(value = "User request to follow a topic", notes = "Provide username and topic id to follow", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
-	public ResponseModel followTopic(@RequestBody @Valid TopicFollowRequest topicFollowRequest, BindingResult bindingResult) throws BusinessException {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel followTopic(@RequestBody @Valid IDRequestModel topicFollowRequest, BindingResult bindingResult) throws BusinessException {
 		
 		validateRequest(topicFollowRequest, bindingResult);
 		
@@ -59,7 +58,7 @@ public class TopicsController {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
-		if (!topicRepository.existsById(topicFollowRequest.getTopicID())) {
+		if (!topicRepository.existsById(topicFollowRequest.getId())) {
 			logger.error("User to follow not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "Topic Not found!!");
 		}
@@ -78,8 +77,8 @@ public class TopicsController {
 
 	@PostMapping("/topics/unfollow")
 	@ApiOperation(value = "User request to unfollow a topic", notes = "Provide username and topic id to unfollow", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
-	public ResponseModel unfollowTopic(@RequestBody @Valid TopicFollowRequest topicFollowRequest, BindingResult bindingResult) throws BusinessException {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel unfollowTopic(@RequestBody @Valid IDRequestModel topicFollowRequest, BindingResult bindingResult) throws BusinessException {
 		
 		validateRequest(topicFollowRequest,bindingResult);
 		
@@ -87,7 +86,7 @@ public class TopicsController {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
-		if (!topicRepository.existsById(topicFollowRequest.getTopicID())) {
+		if (!topicRepository.existsById(topicFollowRequest.getId())) {
 			logger.error("User to follow not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "Topic Not found!!");
 		}
@@ -105,7 +104,7 @@ public class TopicsController {
 
 	@GetMapping("/topics")
 	@ApiOperation(value = "List of topics following", notes = "Username based following topics list", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel followTopicsList() throws BusinessException {
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
@@ -124,7 +123,7 @@ public class TopicsController {
 
 	@GetMapping("/topics/auto-fill/{stringMatch}")
 	@ApiOperation(value = "List of starts-with matching topics", notes = "Get the list of topics starts-with match", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel startsWith(@PathVariable String stringMatch) throws BusinessException {
 		try {
 			responseModel.setData("result", topicService.getStringMatchTopics(stringMatch));
@@ -136,7 +135,7 @@ public class TopicsController {
 		}
 	}
 	
-	private void validateRequest(@RequestBody @Valid TopicFollowRequest topicFollowRequest, BindingResult bindingResult)
+	private void validateRequest(@RequestBody @Valid IDRequestModel topicFollowRequest, BindingResult bindingResult)
 			throws BusinessException {
 		if (topicFollowRequest == null) {
 			logger.error("Empty request object");

@@ -1,12 +1,23 @@
 package ai.infrrd.training.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class ArticlesDto implements Comparable<ArticlesDto> {
 
 	private String id;
 	private String postTitle;
 	private String postDescription;
 	private long timestamp;
-	private int views;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Integer views;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Integer likes;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Integer bookmarks;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Boolean isBookmarked;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Boolean isLiked;
 	private UserDto user;
 
 	public ArticlesDto() {
@@ -27,6 +38,32 @@ public class ArticlesDto implements Comparable<ArticlesDto> {
 		this.postDescription = postDescription;
 		this.timestamp = timestamp;
 		this.views = views;
+		this.user = user;
+	}
+	
+	
+
+	public ArticlesDto(String id, String postTitle, String postDescription, long timestamp, UserDto user) {
+		super();
+		this.id = id;
+		this.postTitle = postTitle;
+		this.postDescription = postDescription;
+		this.timestamp = timestamp;
+		this.user = user;
+	}
+	
+	
+
+	public ArticlesDto(String id, String postTitle, String postDescription, long timestamp, Integer views,
+			Boolean isBookmarked, Boolean isLiked, UserDto user) {
+		super();
+		this.id = id;
+		this.postTitle = postTitle;
+		this.postDescription = postDescription;
+		this.timestamp = timestamp;
+		this.views = views;
+		this.isBookmarked = isBookmarked;
+		this.isLiked = isLiked;
 		this.user = user;
 	}
 
@@ -54,11 +91,11 @@ public class ArticlesDto implements Comparable<ArticlesDto> {
 		this.postDescription = postDescription;
 	}
 
-	public int getViews() {
+	public Integer getViews() {
 		return views;
 	}
 
-	public void setViews(int views) {
+	public void setViews(Integer views) {
 		this.views = views;
 	}
 
@@ -76,6 +113,38 @@ public class ArticlesDto implements Comparable<ArticlesDto> {
 
 	public void setUser(UserDto user) {
 		this.user = user;
+	}
+	
+	public Integer getLikes() {
+		return likes;
+	}
+
+	public void setLikes(Integer likes) {
+		this.likes = likes;
+	}
+
+	public Integer getBookmarks() {
+		return bookmarks;
+	}
+
+	public void setBookmarks(Integer bookmarks) {
+		this.bookmarks = bookmarks;
+	}
+
+	public Boolean getIsBookmarked() {
+		return isBookmarked;
+	}
+
+	public void setIsBookmarked(Boolean isBookmarked) {
+		this.isBookmarked = isBookmarked;
+	}
+
+	public Boolean getIsLiked() {
+		return isLiked;
+	}
+
+	public void setIsLiked(Boolean isLiked) {
+		this.isLiked = isLiked;
 	}
 
 	@Override

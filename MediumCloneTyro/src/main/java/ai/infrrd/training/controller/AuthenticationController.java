@@ -26,7 +26,6 @@ import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.payload.request.SignInRequest;
 import ai.infrrd.training.payload.request.SignUpRequest;
-import ai.infrrd.training.payload.response.MessageResponse;
 import ai.infrrd.training.payload.response.SignInResponse;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.security.jwt.JwtUtils;
@@ -93,7 +92,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signup")
-	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = MessageResponse.class)
+	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = ResponseModel.class)
 	public ResponseModel registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result)
 			throws BusinessException{
 

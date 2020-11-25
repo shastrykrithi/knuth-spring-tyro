@@ -23,8 +23,6 @@ import ai.infrrd.training.exception.BusinessException;
 import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.payload.request.ArticleRequest;
-import ai.infrrd.training.payload.response.ArticleResponse;
-import ai.infrrd.training.payload.response.MessageResponse;
 import ai.infrrd.training.repository.ArticleRepository;
 import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
@@ -58,7 +56,7 @@ public class ArticlesController {
 
 	@GetMapping("/article/{postID}")
 	@ApiOperation(value = "Count number of clicks on a article", authorizations = {
-			@Authorization(value = "jwtToken") }, response = MessageResponse.class)
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel articleClick(@PathVariable String postID) throws BusinessException {
 		if (!articleRepository.existsById(postID)) {
 			logger.error("Article not found");
@@ -66,7 +64,7 @@ public class ArticlesController {
 		}
 
 		try {
-			ArticlesDto article = articleService.getArticle(postID);
+			ArticlesDto article = articleService.getArticle(postID,AuthTokenFilter.currentUser);
 			responseModel.setData("result", article);
 			return responseModel;
 		} catch (MessageException e) {
@@ -77,7 +75,7 @@ public class ArticlesController {
 
 	@GetMapping("/feed")
 	@ApiOperation(value = "Get the List of Articles", notes = "The Articles of all users are shown up here", authorizations = {
-			@Authorization(value = "jwtToken") }, response = ArticleResponse.class)
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel listOfArticles() throws BusinessException {
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
@@ -95,7 +93,7 @@ public class ArticlesController {
 
 	@GetMapping("/trending")
 	@ApiOperation(value = "Get the Trending Articles", notes = "The Articles with highest clicks are shown up here", authorizations = {
-			@Authorization(value = "jwtToken") }, response = ArticleResponse.class)
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel trendingArticles() throws BusinessException {
 		try {
 			List<ArticlesDto> articleList = articleService.getTrendingArticles();
@@ -109,7 +107,7 @@ public class ArticlesController {
 
 	@PostMapping("/publish")
 	@ApiOperation(value = "Publish the Article", notes = "Write the Post with title and description", authorizations = {
-			@Authorization(value = "jwtToken") }, response = ArticleResponse.class)
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel publishArticle(@Valid @RequestBody ArticleRequest articleRequest, BindingResult result)
 			throws BusinessException {
 
