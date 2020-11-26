@@ -7,11 +7,14 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ai.infrrd.training.dto.NotificationsDto;
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.MessageException;
+import ai.infrrd.training.model.Notifications;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.FollowerRepository;
+import ai.infrrd.training.repository.NotificationRepository;
 import ai.infrrd.training.repository.UserRepository;
 
 @Service
@@ -22,6 +25,9 @@ public class FollowersService {
 
 	@Autowired
 	UserRepository userRepo;
+	
+	@Autowired
+	NotificationRepository notificationRepository;
 
 	public HashSet<UserDto> getAllFollowers() throws MessageException {
 
@@ -88,6 +94,7 @@ public class FollowersService {
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
 		HashSet<UserDto> newfollowedByList = new HashSet<UserDto>();
+		HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
 		Users followUser = new Users();
 
 		if (optionalUser.isPresent()) {
@@ -108,6 +115,30 @@ public class FollowersService {
 			user.setFollowing(newUserList);
 			userRepo.save(user);
 			userRepo.save(followUser);
+			
+			// set notification
+			Notifications notification = notificationRepository.findByNotifyforAndNotificationName("follow",
+					username);
+			if(notification==null) {
+				notification = new Notifications("follow", username);
+				notificationRepository.save(notification);
+			}
+			
+				if (userRepo.existsByUsername(followUser.getUsername())) {
+					if (followUser.getNotifications() != null) {
+						notificationList = user.getNotifications();
+
+					}
+
+					Notifications currentNotification = notificationRepository.findByNotifyforAndNotificationName("follow",
+									username);
+					if (currentNotification.getId() != null) {
+						notificationList.add(new NotificationsDto(currentNotification.getId(), false));
+					}
+					followUser.setNotifications(notificationList);
+					userRepo.save(followUser);
+				}
+			
 		}
 		
 		return true;

@@ -32,6 +32,13 @@ public class Notifications {
 	}
 
 
+	public Notifications( String notifyfor, String notificationName) {
+		super();
+		this.notifyfor = notifyfor;
+		this.notificationName = notificationName;
+	}
+
+
 	public String getId() {
 		return id;
 	}

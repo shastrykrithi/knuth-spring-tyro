@@ -26,23 +26,23 @@ public class UploadController {
 
 	@Autowired
 	CloudinaryService cloudinaryService;
-	
+
 	@Autowired
 	ResponseModel responseModel;
-	
+
 	@PostMapping("/uploadProfilePhoto")
 	@ApiOperation(value = "Upload Profile Photo", notes = "Add a Photo to your Profile", authorizations = {
-			@Authorization(value = "jwtToken") }, response = ResponseModel.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Authorization(value = "jwtToken") }, response = ResponseModel.class, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseModel uploadFile(@ApiParam(name = "file", required = true) @RequestPart MultipartFile file)
 			throws BusinessException {
+
 		String url = cloudinaryService.putURL(file, AuthTokenFilter.currentUser);
-		if(url!=null) {
-			responseModel.setData("result",url);
+		if (url != null) {
+			responseModel.setData("result", url);
+		} else {
+			responseModel.setData("error", "Not able to generate URL!!!");
 		}
-		else {
-			responseModel.setData("error","Not able to generate URL!!!");
-		}
-        
-        return responseModel;
+
+		return responseModel;
 	}
 }
