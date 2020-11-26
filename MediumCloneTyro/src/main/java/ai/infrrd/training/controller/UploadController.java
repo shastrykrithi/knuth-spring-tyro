@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import ai.infrrd.training.exception.BusinessException;
+import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.service.CloudinaryService;
 import ai.infrrd.training.service.ResponseModel;
 import io.swagger.annotations.ApiOperation;
@@ -26,12 +28,18 @@ public class UploadController {
 	@Autowired
 	ResponseModel responseModel;
 	
-	@PostMapping("/upload")
+	@PostMapping("/uploadProfilePhoto")
 	@ApiOperation(value = "Upload Profile Photo", notes = "Add a Photo to your Profile", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public String uploadFile(@RequestParam("file") MultipartFile file) {
-		String url = cloudinaryService.uploadFile(file);
-        //return responseModel.setData("Result", url);
-		return "File uploaded successfully: File path :  " + url;
+	public ResponseModel uploadFile(@RequestParam("file") MultipartFile file) throws BusinessException{
+		String url = cloudinaryService.putURL(file, AuthTokenFilter.currentUser);
+		if(url!=null) {
+			responseModel.setData("result",url);
+		}
+		else {
+			responseModel.setData("error","Not able to generate URL!!!");
+		}
+        
+        return responseModel;
 	}
 }

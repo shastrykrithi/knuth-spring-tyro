@@ -27,9 +27,11 @@ public class MediumCloneTyroApplication {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Bean
 	public Cloudinary cloudinaryConfig() {
 		Cloudinary cloudinary = null;
+		@SuppressWarnings("rawtypes")
 		Map config = new HashMap();
 		config.put("cloud_name", cloudName);
 		config.put("api_key", apiKey);

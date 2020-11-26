@@ -27,6 +27,7 @@ public class Users {
 	private HashSet<String> bookmarks;
 	private HashSet<String> liked;
 	private HashSet<NotificationsDto> notifications;
+	private String profileURL;
 	
 
 	public Users() {
@@ -129,6 +130,15 @@ public class Users {
 
 	public void setNotifications(HashSet<NotificationsDto> notifications) {
 		this.notifications = notifications;
+	}
+	
+	
+	public String getProfileURL() {
+		return profileURL;
+	}
+
+	public void setProfileURL(String profileURL) {
+		this.profileURL = profileURL;
 	}
 
 	@Override
