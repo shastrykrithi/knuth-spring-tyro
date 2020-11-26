@@ -118,7 +118,7 @@ public class ArticlesController {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
 		try {
-			articleService.postArticle(articleRequest);
+			articleService.postArticle(articleRequest,AuthTokenFilter.currentUser);
 		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());

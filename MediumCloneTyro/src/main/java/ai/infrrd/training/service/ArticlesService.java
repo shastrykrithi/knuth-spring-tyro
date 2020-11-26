@@ -13,15 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ai.infrrd.training.dto.ArticlesDto;
+import ai.infrrd.training.dto.NotificationsDto;
 import ai.infrrd.training.dto.UserDto;
 import ai.infrrd.training.exception.MessageException;
-import ai.infrrd.training.filter.AuthTokenFilter;
 import ai.infrrd.training.model.Articles;
+import ai.infrrd.training.model.Notifications;
 import ai.infrrd.training.model.Topics;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.ArticleRequest;
 import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.ArticleRepository;
+import ai.infrrd.training.repository.NotificationRepository;
 import ai.infrrd.training.repository.TopicRepository;
 import ai.infrrd.training.repository.UserRepository;
 
@@ -36,6 +38,9 @@ public class ArticlesService {
 
 	@Autowired
 	TopicRepository topicRepository;
+
+	@Autowired
+	NotificationRepository notificationRepository;
 
 	public List<ArticlesDto> getAllArticles(String username) throws MessageException {
 		HashSet<UserDto> followers = userRepo.findByUsername(username).getFollowing();
@@ -75,20 +80,19 @@ public class ArticlesService {
 		} else {
 			throw new MessageException("Articles list is empty");
 		}
+		
 		return articles;
 	}
 
-	public ArticlesDto getArticle(String postID,String username) throws MessageException {
-		boolean isLiked=false;
-		boolean isBookmarked=false;
-		
+	public ArticlesDto getArticle(String postID, String username) throws MessageException {
+		boolean isLiked = false;
+		boolean isBookmarked = false;
+
 		Optional<Articles> optionalArticle = articleRepository.findById(postID);
 		Users user = userRepo.findByUsername(username);
-		
-		
+
 		HashSet<String> list = new HashSet<String>();
 		Articles article = new Articles();
-		
 
 		if (optionalArticle.isPresent()) {
 			article = optionalArticle.get();
@@ -99,31 +103,36 @@ public class ArticlesService {
 		if (optionalArticle.isPresent()) {
 			article = optionalArticle.get();
 		}
-		
+
 		if (user.getBookmarks() != null) {
 			list = user.getBookmarks();
-			if(list.contains(article.getId())) {
-				isBookmarked=true;	
+			if (list.contains(article.getId())) {
+				isBookmarked = true;
 			}
 		}
-		
-		if (user.getLiked()!= null) {
+
+		if (user.getLiked() != null) {
 			list = user.getLiked();
-			if(list.contains(article.getId())) {
-				isLiked=true;	
+			if (list.contains(article.getId())) {
+				isLiked = true;
 			}
 		}
-		
-		
+
 		return new ArticlesDto(article.getId(), article.getPostTitle(), article.getPostDescription(),
-				article.getTimestamp(), article.getViews(), isBookmarked,isLiked,article.getUser());
+				article.getTimestamp(), article.getViews(),article.getLikes(), isBookmarked, isLiked, article.getUser());
 	}
 
-	public boolean postArticle(ArticleRequest articleRequest) throws MessageException {
+	public boolean postArticle(ArticleRequest articleRequest, String username) throws MessageException {
+		long timestamp = Instant.now().toEpochMilli();
 		Articles article = new Articles();
 		HashSet<IDRequestModel> topicsList = new HashSet<IDRequestModel>();
+	
 
-		Users user = userRepo.findByUsername(AuthTokenFilter.currentUser);
+		Users user = userRepo.findByUsername(username);
+		HashSet<UserDto> followingList = new HashSet<UserDto>();
+		if (user.getFollowedBy() != null) {
+			followingList = user.getFollowedBy();
+		}
 
 		for (IDRequestModel element : articleRequest.getTopics()) {
 			Optional<Topics> optionalTopic = topicRepository.findById(element.getId());
@@ -141,9 +150,75 @@ public class ArticlesService {
 
 		article.setUser(new UserDto(user.getId(), user.getUsername()));
 
-		article.setTimestamp(Instant.now().toEpochMilli());
-
+		article.setTimestamp(timestamp);
 		articleRepository.save(article);
+
+		if (articleRepository.existsByTimestamp(timestamp)) {
+
+			// set notification for user followers
+
+			if (!followingList.isEmpty()) {
+				Notifications notification = new Notifications("publish", username, article.getId(),
+						article.getPostTitle(), article.getTimestamp());
+				notificationRepository.save(notification);
+				for (UserDto follower : followingList) {
+					
+					if (userRepo.existsByUsername(follower.getUsername())) {
+						HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
+						Users followeruser = userRepo.findByUsername(follower.getUsername());
+						if (followeruser.getNotifications() != null) {
+							notificationList = user.getNotifications();
+
+						}
+					
+					Notifications currentNotification=notificationRepository.findByNotifyforAndPostId("publish",article.getId());
+					if(currentNotification.getId()!=null) {
+						notificationList.add(new NotificationsDto(currentNotification.getId(),false));
+					}
+					followeruser.setNotifications(notificationList);
+					userRepo.save(followeruser);
+					}
+				}
+
+			}
+
+			// set notification for topic followers
+
+			for (IDRequestModel topic : topicsList) {
+				
+				Optional<Topics> optionalTopic = topicRepository.findById(topic.getId());
+				if (optionalTopic.isPresent()) {
+					Notifications notification = new Notifications("topic",
+							optionalTopic.get().getTopicName(), article.getId(), article.getPostTitle(),
+							article.getTimestamp());
+					notificationRepository.save(notification);
+
+						for (UserDto follower : optionalTopic.get().getUsers()) {
+							
+							if (userRepo.existsByUsername(follower.getUsername())) {
+								HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
+								Users followeruser = userRepo.findByUsername(follower.getUsername());
+								if (followeruser.getNotifications() != null) {
+									notificationList = followeruser.getNotifications();
+
+								}
+							
+							Notifications currentNotification=notificationRepository.findByNotificationNameAndPostId(optionalTopic.get().getTopicName(),article.getId());
+							if(currentNotification.getId()!=null) {
+								notificationList.add(new NotificationsDto(currentNotification.getId(),false));
+							}
+							followeruser.setNotifications(notificationList);
+							userRepo.save(followeruser);
+							}
+						}
+
+				} else {
+					throw new MessageException("Topic not found!!");
+				}
+
+			}
+
+		}
 
 		return true;
 
@@ -176,6 +251,7 @@ public class ArticlesService {
 	public boolean likeArticle(IDRequestModel idRequestModel, String currentUser) throws MessageException {
 		Articles article = new Articles();
 		HashSet<String> likedList = new HashSet<String>();
+		HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
 
 		Optional<Articles> optionalArticle = articleRepository.findById(idRequestModel.getId());
 
@@ -183,8 +259,26 @@ public class ArticlesService {
 			article = optionalArticle.get();
 			article.setLikes(article.getLikes() + 1);
 			articleRepository.save(article);
-		}
 
+			// set notification
+			Notifications notification = new Notifications("like", currentUser, article.getId(),
+					article.getPostTitle(), article.getTimestamp());
+			notificationRepository.save(notification);
+			if (userRepo.existsByUsername(article.getUser().getUsername())) {
+				Users user = userRepo.findByUsername(article.getUser().getUsername());
+				if (user.getNotifications() != null) {
+					notificationList = user.getNotifications();
+
+				}
+			
+			Notifications currentNotification=notificationRepository.findByNotifyforAndPostIdAndNotificationName("like",article.getId(),currentUser);
+			if(currentNotification.getId()!=null) {
+				notificationList.add(new NotificationsDto(currentNotification.getId(),false));
+			}
+			user.setNotifications(notificationList);
+			userRepo.save(user);
+			}
+		}
 		Users user = userRepo.findByUsername(currentUser);
 
 		if (user.getLiked() != null) {
@@ -193,6 +287,7 @@ public class ArticlesService {
 		likedList.add(idRequestModel.getId());
 		user.setLiked(likedList);
 		userRepo.save(user);
+
 		return true;
 
 	}
@@ -207,7 +302,7 @@ public class ArticlesService {
 
 		if (user.getBookmarks() != null) {
 			bookmarkList = user.getBookmarks();
-			if(!bookmarkList.isEmpty()) {
+			if (!bookmarkList.isEmpty()) {
 				for (String article : bookmarkList) {
 					Optional<Articles> optionalArticle = articleRepository.findById(article);
 					if (optionalArticle.isPresent()) {
@@ -217,10 +312,10 @@ public class ArticlesService {
 					}
 
 				}
-			}else {
+			} else {
 				throw new MessageException("No added user bookmarks!!!");
 			}
-			
+
 		} else {
 			throw new MessageException("No added user bookmarks!!!");
 		}
@@ -228,7 +323,7 @@ public class ArticlesService {
 		return articles;
 	}
 
-	public boolean removeBookmark(@Valid IDRequestModel idRequestModel, String currentUser) throws MessageException{
+	public boolean removeBookmark(@Valid IDRequestModel idRequestModel, String currentUser) throws MessageException {
 		Articles article = new Articles();
 		HashSet<String> bookmarkList = new HashSet<String>();
 
@@ -244,7 +339,6 @@ public class ArticlesService {
 
 			}
 		}
-			
 
 		Users user = userRepo.findByUsername(currentUser);
 
@@ -253,17 +347,16 @@ public class ArticlesService {
 			bookmarkList.remove(idRequestModel.getId());
 			user.setBookmarks(bookmarkList);
 			userRepo.save(user);
-		}
-		else {
+		} else {
 			throw new MessageException("User not having any bookmarks!!!");
 
 		}
-		
+
 		return true;
 
 	}
-	
-	public boolean unlikeArticle(@Valid IDRequestModel idRequestModel, String currentUser) throws MessageException{
+
+	public boolean unlikeArticle(@Valid IDRequestModel idRequestModel, String currentUser) throws MessageException {
 		Articles article = new Articles();
 		HashSet<String> likesList = new HashSet<String>();
 
@@ -279,7 +372,6 @@ public class ArticlesService {
 
 			}
 		}
-			
 
 		Users user = userRepo.findByUsername(currentUser);
 
@@ -288,15 +380,41 @@ public class ArticlesService {
 			likesList.remove(idRequestModel.getId());
 			user.setLiked(likesList);
 			userRepo.save(user);
-		}
-		else {
+		} else {
 			throw new MessageException("User not at liked any posts!!!");
+
+		}
+
+		return true;
+
+	}
+
+	public boolean notificationRead(IDRequestModel notificationId, String currentUser) throws MessageException{
+		Users user = userRepo.findByUsername(currentUser);
+		HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
+		boolean checkNotification=false;
+		
+		if (user.getNotifications() != null) {
+			notificationList=user.getNotifications();
+			for(NotificationsDto notification:notificationList) {
+				if(notificationId.getId().equals(notification.getId())) {
+					notification.setIsread(true);
+					checkNotification=true;
+				}
+			}
+			if(!checkNotification) {
+				throw new MessageException("User is not having this notification!!");
+			}
+			user.setNotifications(notificationList);
+			userRepo.save(user);
+		} else {
+			throw new MessageException("No notifications for the user!!!");
 
 		}
 		
 		return true;
-
+		
+		
 	}
-	
-	
+
 }

@@ -17,7 +17,11 @@ public interface ArticleRepository extends MongoRepository<Articles, String> {
 	public List<Articles> findTop4ByOrderByViewsDesc();
 
 	boolean existsById(String postID);
-
+	
+	boolean existsByTimestamp(long timestamp);
+	
+	public Articles findByTimestamp(long timestamp);
+	
 	@Query("{'user.username': ?0}")
 	public List<ArticlesDto> findByUserName(String username);
 

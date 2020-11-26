@@ -89,7 +89,11 @@ public class TopicsService {
 
 		if (topic.getUsers() != null) {
 			newUserList = topic.getUsers();
-			newUserList.remove(new UserDto(user.getId(), user.getUsername()));
+			if(!newUserList.isEmpty()) {
+				newUserList.remove(new UserDto(user.getId(), user.getUsername()));
+			}else {
+				new MessageException("No users following the topic yet!!");
+			}
 			topic.setUsers(newUserList);
 			topicRepository.save(topic);
 		} else {
@@ -100,7 +104,12 @@ public class TopicsService {
 
 		if (user.getTopics() != null) {
 			newtopicList = user.getTopics();
-			newtopicList.remove(new TopicsDto(topic.getId(), topic.getTopicName()));
+			if(!newUserList.isEmpty()) {
+				newtopicList.remove(new TopicsDto(topic.getId(), topic.getTopicName()));
+			}
+			else {
+				new MessageException("No topics followed by user yet!!");
+			}
 			user.setTopics(newtopicList);
 			userRepo.save(user);
 		} else {

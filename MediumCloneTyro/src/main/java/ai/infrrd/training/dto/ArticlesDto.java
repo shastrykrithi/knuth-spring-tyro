@@ -66,6 +66,22 @@ public class ArticlesDto implements Comparable<ArticlesDto> {
 		this.isLiked = isLiked;
 		this.user = user;
 	}
+	
+	
+
+	public ArticlesDto(String id, String postTitle, String postDescription, long timestamp, Integer views,
+			Integer likes, Boolean isBookmarked, Boolean isLiked, UserDto user) {
+		super();
+		this.id = id;
+		this.postTitle = postTitle;
+		this.postDescription = postDescription;
+		this.timestamp = timestamp;
+		this.views = views;
+		this.likes = likes;
+		this.isBookmarked = isBookmarked;
+		this.isLiked = isLiked;
+		this.user = user;
+	}
 
 	public String getId() {
 		return id;

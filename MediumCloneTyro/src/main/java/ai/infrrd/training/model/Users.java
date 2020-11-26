@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import ai.infrrd.training.dto.NotificationsDto;
 import ai.infrrd.training.dto.TopicsDto;
 import ai.infrrd.training.dto.UserDto;
 
@@ -20,10 +21,13 @@ public class Users {
 	@Indexed(unique = true)
 	private String email;
 	private HashSet<UserDto> following;
+	private HashSet<UserDto> followedBy;
 	private HashSet<String> publishedArticles;
 	private HashSet<TopicsDto> topics;
 	private HashSet<String> bookmarks;
 	private HashSet<String> liked;
+	private HashSet<NotificationsDto> notifications;
+	
 
 	public Users() {
 
@@ -108,6 +112,23 @@ public class Users {
 
 	public void setLiked(HashSet<String> liked) {
 		this.liked = liked;
+	}
+	
+	public HashSet<UserDto> getFollowedBy() {
+		return followedBy;
+	}
+
+	public void setFollowedBy(HashSet<UserDto> followedBy) {
+		this.followedBy = followedBy;
+	}
+	
+
+	public HashSet<NotificationsDto> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(HashSet<NotificationsDto> notifications) {
+		this.notifications = notifications;
 	}
 
 	@Override

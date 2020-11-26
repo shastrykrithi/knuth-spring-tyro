@@ -84,8 +84,10 @@ public class FollowersService {
 		Users user = userRepo.findByUsername(username);
 
 		Optional<Users> optionalUser = userRepo.findById(followerRequest.getId());
+		
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
+		HashSet<UserDto> newfollowedByList = new HashSet<UserDto>();
 		Users followUser = new Users();
 
 		if (optionalUser.isPresent()) {
@@ -94,10 +96,20 @@ public class FollowersService {
 			if (user.getFollowing() != null) {
 				newUserList = user.getFollowing();
 			}
+			
+			if(followUser.getFollowedBy()!=null) {
+				newfollowedByList=followUser.getFollowedBy();
+			}
+			
+			
 			newUserList.add(new UserDto(followUser.getId(), followUser.getUsername()));
+			newfollowedByList.add(new UserDto(user.getId(), username));
+			followUser.setFollowedBy(newfollowedByList);
+			user.setFollowing(newUserList);
+			userRepo.save(user);
+			userRepo.save(followUser);
 		}
-		user.setFollowing(newUserList);
-		userRepo.save(user);
+		
 		return true;
 	}
 
@@ -108,18 +120,33 @@ public class FollowersService {
 		Optional<Users> optionalUser = userRepo.findById(followerRequest.getId());
 
 		HashSet<UserDto> newUserList = new HashSet<UserDto>();
+		HashSet<UserDto> newfollowedByList = new HashSet<UserDto>();
 		Users followUser = new Users();
 
 		if (optionalUser.isPresent()) {
 			followUser = optionalUser.get();
-			if (user.getFollowing() != null) {
+
+			if (user.getFollowing() != null ) {
 				newUserList = user.getFollowing();
-				newUserList.remove(new UserDto(followUser.getId(), followUser.getUsername()));
-				user.setFollowing(newUserList);
-				userRepo.save(user);
-			} else {
-				new MessageException("User is not following anyone yet!!!!");
 			}
+			else {
+				throw new MessageException("User not following anyone!!");
+			}
+			
+			if(followUser.getFollowedBy()!=null) {
+				newfollowedByList=followUser.getFollowedBy();
+			}
+			if(!newUserList.isEmpty()||!newfollowedByList.isEmpty()) {
+				newUserList.remove(new UserDto(followUser.getId(), followUser.getUsername()));
+				newfollowedByList.remove(new UserDto(user.getId(), username));
+			}
+			else {
+				throw new MessageException("User not following anyone!!");
+			}
+			followUser.setFollowedBy(newfollowedByList);
+			user.setFollowing(newUserList);
+			userRepo.save(user);
+			userRepo.save(followUser);
 		}
 		return true;
 	}
