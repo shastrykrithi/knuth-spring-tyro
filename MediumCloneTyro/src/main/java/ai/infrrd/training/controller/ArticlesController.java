@@ -64,7 +64,7 @@ public class ArticlesController {
 		}
 
 		try {
-			ArticlesDto article = articleService.getArticle(postID,AuthTokenFilter.currentUser);
+			ArticlesDto article = articleService.getArticle(postID, AuthTokenFilter.currentUser);
 			responseModel.setData("result", article);
 			return responseModel;
 		} catch (MessageException e) {
@@ -118,7 +118,7 @@ public class ArticlesController {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
 		try {
-			articleService.postArticle(articleRequest,AuthTokenFilter.currentUser);
+			articleService.postArticle(articleRequest, AuthTokenFilter.currentUser);
 		} catch (MessageException e) {
 			logger.error(e.getMessage());
 			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -136,7 +136,7 @@ public class ArticlesController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST,  "Invalid arguments");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid arguments");
 		}
 
 	}

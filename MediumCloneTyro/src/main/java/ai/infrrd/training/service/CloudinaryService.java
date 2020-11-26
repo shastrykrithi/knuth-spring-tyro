@@ -14,7 +14,6 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
 import ai.infrrd.training.exception.BusinessException;
-import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.repository.UserRepository;
 
@@ -23,10 +22,9 @@ public class CloudinaryService {
 
 	@Autowired
 	Cloudinary cloudinaryConfig;
-	
+
 	@Autowired
 	UserRepository userRepo;
-
 
 	public String uploadFile(MultipartFile file) throws BusinessException {
 		try {
@@ -45,11 +43,11 @@ public class CloudinaryService {
 		fos.close();
 		return convFile;
 	}
-	
-	public String putURL(MultipartFile file,String username) throws BusinessException{
-		String url=null;
+
+	public String putURL(MultipartFile file, String username) throws BusinessException {
+		String url = null;
 		try {
-			url=uploadFile(file);
+			url = uploadFile(file);
 			Users user = userRepo.findByUsername(username);
 			user.setProfileURL(url);
 			userRepo.save(user);
@@ -57,6 +55,6 @@ public class CloudinaryService {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 		return url;
-		
+
 	}
 }

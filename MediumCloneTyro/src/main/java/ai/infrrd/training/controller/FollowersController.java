@@ -49,10 +49,11 @@ public class FollowersController {
 	@PostMapping("/people/follow")
 	@ApiOperation(value = "User request to follow a user", notes = "Provide username and user id to follow", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public ResponseModel followTopic(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult) throws BusinessException {
-		
-		validateRequest(followerRequest,bindingResult);
-		
+	public ResponseModel followTopic(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult)
+			throws BusinessException {
+
+		validateRequest(followerRequest, bindingResult);
+
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -76,10 +77,11 @@ public class FollowersController {
 	@PostMapping("/people/unfollow")
 	@ApiOperation(value = "User request to unfollow a user", notes = "Provide username and user id to unfollow", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public ResponseModel unfollowTopic(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult) throws BusinessException {
-		
-		validateRequest(followerRequest,bindingResult);
-		
+	public ResponseModel unfollowTopic(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult)
+			throws BusinessException {
+
+		validateRequest(followerRequest, bindingResult);
+
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -117,7 +119,7 @@ public class FollowersController {
 			return responseModel;
 		}
 	}
-	
+
 	private void validateRequest(@RequestBody @Valid IDRequestModel followerRequest, BindingResult bindingResult)
 			throws BusinessException {
 		if (followerRequest == null) {
@@ -127,7 +129,7 @@ public class FollowersController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST,  "Invalid arguments");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid arguments");
 		}
 
 	}

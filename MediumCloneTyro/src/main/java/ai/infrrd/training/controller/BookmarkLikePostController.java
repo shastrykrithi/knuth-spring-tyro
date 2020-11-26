@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
 @RestController
 @RequestMapping("/v1")
 public class BookmarkLikePostController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ArticlesController.class);
 
 	@Autowired
@@ -50,14 +50,14 @@ public class BookmarkLikePostController {
 	@Autowired
 	ResponseModel responseModel;
 
-	
 	@PostMapping("/article/bookmark")
 	@ApiOperation(value = "User request to bookmark article", notes = "Provide postID to bookmark", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public ResponseModel bookMarkArticle(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult) throws BusinessException {
-		
-		validateRequest(idRequestModel,bindingResult);
-		
+	public ResponseModel bookMarkArticle(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult)
+			throws BusinessException {
+
+		validateRequest(idRequestModel, bindingResult);
+
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -77,14 +77,15 @@ public class BookmarkLikePostController {
 		responseModel.setData("result", "Article bookmarked");
 		return responseModel;
 	}
-	
+
 	@PostMapping("/article/like")
 	@ApiOperation(value = "User request to bookmark article", notes = "Provide postID to bookmark", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public ResponseModel likeArticle(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult) throws BusinessException {
-		
-		validateRequest(idRequestModel,bindingResult);
-		
+	public ResponseModel likeArticle(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult)
+			throws BusinessException {
+
+		validateRequest(idRequestModel, bindingResult);
+
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -104,7 +105,7 @@ public class BookmarkLikePostController {
 		responseModel.setData("result", "Article liked");
 		return responseModel;
 	}
-	
+
 	@GetMapping("/bookmarks")
 	@ApiOperation(value = "List of bookmarks", notes = "User bookmarks list", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
@@ -123,14 +124,15 @@ public class BookmarkLikePostController {
 			return responseModel;
 		}
 	}
-	
+
 	@PostMapping("/bookmarks/remove")
 	@ApiOperation(value = "User request to bookmark article", notes = "Provide postID to bookmark", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public ResponseModel removeBookmark(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult) throws BusinessException {
-		
-		validateRequest(idRequestModel,bindingResult);
-		
+	public ResponseModel removeBookmark(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult)
+			throws BusinessException {
+
+		validateRequest(idRequestModel, bindingResult);
+
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -150,14 +152,15 @@ public class BookmarkLikePostController {
 		responseModel.setData("result", "Removed from bookmarks!!");
 		return responseModel;
 	}
-	
+
 	@PostMapping("/like/remove")
 	@ApiOperation(value = "User request to bookmark article", notes = "Provide postID to bookmark", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public ResponseModel unlikeArticle(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult) throws BusinessException {
-		
-		validateRequest(idRequestModel,bindingResult);
-		
+	public ResponseModel unlikeArticle(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult)
+			throws BusinessException {
+
+		validateRequest(idRequestModel, bindingResult);
+
 		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
 			logger.error("User not found");
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
@@ -177,8 +180,7 @@ public class BookmarkLikePostController {
 		responseModel.setData("result", "Article un-liked");
 		return responseModel;
 	}
-	
-	
+
 	private void validateRequest(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult)
 			throws BusinessException {
 		if (idRequestModel == null) {
@@ -188,12 +190,9 @@ public class BookmarkLikePostController {
 		if (bindingResult.hasFieldErrors()) {
 			String errorMessage = bindingResult.getFieldError().getDefaultMessage();
 			logger.error("Received request with invalid arguments. [ErrorMessage={}]", errorMessage);
-			throw new BusinessException(HttpStatus.BAD_REQUEST,  "Invalid arguments");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid arguments");
 		}
 
 	}
-	
-	
-	
 
 }

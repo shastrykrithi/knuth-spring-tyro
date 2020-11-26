@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -94,7 +93,7 @@ public class AuthenticationController {
 	@PostMapping("/signup")
 	@ApiOperation(value = "Add a new User", notes = "Provide email,password and username to sign-up", response = ResponseModel.class)
 	public ResponseModel registerUser(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result)
-			throws BusinessException{
+			throws BusinessException {
 
 		validateSignUpRequest(signUpRequest, result);
 

@@ -21,7 +21,6 @@ import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.NotificationRepository;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.service.ArticlesService;
-import ai.infrrd.training.service.FollowersService;
 import ai.infrrd.training.service.ResponseModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
