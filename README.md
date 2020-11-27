@@ -1,5 +1,7 @@
 # TYRO Application
 This is a Medium Clone Application developed on JAVA / MAVEN / SPRING BOOT (Version 2.3.5)
+This is a platform where one can write blogs, post articles, read articles from other users, follow users and also follow topics.
+Also get notified when some other users follows you, when your followed user posts article and when you follow some topic or follow a user.
 ## Requirements
 1. Java 1.8 and above
 2. Maven 4.0.0 and above
