@@ -22,6 +22,7 @@ import ai.infrrd.training.model.Topics;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.ArticleRequest;
 import ai.infrrd.training.payload.request.IDRequestModel;
+import ai.infrrd.training.payload.response.PushNotificationResponse;
 import ai.infrrd.training.repository.ArticleRepository;
 import ai.infrrd.training.repository.NotificationRepository;
 import ai.infrrd.training.repository.TopicRepository;
@@ -41,6 +42,9 @@ public class ArticlesService {
 
 	@Autowired
 	NotificationRepository notificationRepository;
+
+	@Autowired
+	PushNotificationService pushNotificationService;
 
 	public List<ArticlesDto> getAllArticles(String username) throws MessageException {
 		HashSet<UserDto> followers = userRepo.findByUsername(username).getFollowing();
@@ -80,7 +84,7 @@ public class ArticlesService {
 		} else {
 			throw new MessageException("Articles list is empty");
 		}
-		
+
 		return articles;
 	}
 
@@ -119,14 +123,14 @@ public class ArticlesService {
 		}
 
 		return new ArticlesDto(article.getId(), article.getPostTitle(), article.getPostDescription(),
-				article.getTimestamp(), article.getViews(),article.getLikes(), isBookmarked, isLiked, article.getUser());
+				article.getTimestamp(), article.getViews(), article.getLikes(), isBookmarked, isLiked,
+				article.getUser());
 	}
 
 	public boolean postArticle(ArticleRequest articleRequest, String username) throws MessageException {
 		long timestamp = Instant.now().toEpochMilli();
 		Articles article = new Articles();
 		HashSet<IDRequestModel> topicsList = new HashSet<IDRequestModel>();
-	
 
 		Users user = userRepo.findByUsername(username);
 		HashSet<UserDto> followingList = new HashSet<UserDto>();
@@ -162,7 +166,7 @@ public class ArticlesService {
 						article.getPostTitle(), article.getTimestamp());
 				notificationRepository.save(notification);
 				for (UserDto follower : followingList) {
-					
+
 					if (userRepo.existsByUsername(follower.getUsername())) {
 						HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
 						Users followeruser = userRepo.findByUsername(follower.getUsername());
@@ -170,14 +174,24 @@ public class ArticlesService {
 							notificationList = user.getNotifications();
 
 						}
-					
-					Notifications currentNotification=notificationRepository.findByNotifyforAndPostId("publish",article.getId());
-					if(currentNotification.getId()!=null) {
-						notificationList.add(new NotificationsDto(currentNotification.getId(),false));
+
+						Notifications currentNotification = notificationRepository.findByNotifyforAndPostId("publish",
+								article.getId());
+						if (currentNotification.getId() != null) {
+							notificationList.add(new NotificationsDto(currentNotification.getId(), false));
+						}
+						followeruser.setNotifications(notificationList);
+						userRepo.save(followeruser);
+
+						if (followeruser.getDeviceToken() != null) {
+							PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
+							pushNotificationResponse.setTarget(followeruser.getDeviceToken());
+							pushNotificationResponse.setTitle("publish");
+							pushNotificationResponse.setBody(currentNotification.toString());
+							pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
+						}
 					}
-					followeruser.setNotifications(notificationList);
-					userRepo.save(followeruser);
-					}
+
 				}
 
 			}
@@ -185,32 +199,41 @@ public class ArticlesService {
 			// set notification for topic followers
 
 			for (IDRequestModel topic : topicsList) {
-				
+
 				Optional<Topics> optionalTopic = topicRepository.findById(topic.getId());
 				if (optionalTopic.isPresent()) {
-					Notifications notification = new Notifications("topic",
-							optionalTopic.get().getTopicName(), article.getId(), article.getPostTitle(),
-							article.getTimestamp());
+					Notifications notification = new Notifications("topic", optionalTopic.get().getTopicName(),
+							article.getId(), article.getPostTitle(), article.getTimestamp());
 					notificationRepository.save(notification);
 
-						for (UserDto follower : optionalTopic.get().getUsers()) {
-							
-							if (userRepo.existsByUsername(follower.getUsername())) {
-								HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
-								Users followeruser = userRepo.findByUsername(follower.getUsername());
-								if (followeruser.getNotifications() != null) {
-									notificationList = followeruser.getNotifications();
+					for (UserDto follower : optionalTopic.get().getUsers()) {
 
-								}
-							
-							Notifications currentNotification=notificationRepository.findByNotificationNameAndPostId(optionalTopic.get().getTopicName(),article.getId());
-							if(currentNotification.getId()!=null) {
-								notificationList.add(new NotificationsDto(currentNotification.getId(),false));
+						if (userRepo.existsByUsername(follower.getUsername())) {
+							HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
+							Users followeruser = userRepo.findByUsername(follower.getUsername());
+							if (followeruser.getNotifications() != null) {
+								notificationList = followeruser.getNotifications();
+
+							}
+
+							Notifications currentNotification = notificationRepository.findByNotificationNameAndPostId(
+									optionalTopic.get().getTopicName(), article.getId());
+							if (currentNotification.getId() != null) {
+								notificationList.add(new NotificationsDto(currentNotification.getId(), false));
 							}
 							followeruser.setNotifications(notificationList);
 							userRepo.save(followeruser);
+
+							if (followeruser.getDeviceToken() != null) {
+								PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
+								pushNotificationResponse.setTarget(followeruser.getDeviceToken());
+								pushNotificationResponse.setTitle("topic");
+								pushNotificationResponse.setBody(currentNotification.toString());
+								pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
 							}
+
 						}
+					}
 
 				} else {
 					throw new MessageException("Topic not found!!");
@@ -261,8 +284,8 @@ public class ArticlesService {
 			articleRepository.save(article);
 
 			// set notification
-			Notifications notification = new Notifications("like", currentUser, article.getId(),
-					article.getPostTitle(), article.getTimestamp());
+			Notifications notification = new Notifications("like", currentUser, article.getId(), article.getPostTitle(),
+					article.getTimestamp());
 			notificationRepository.save(notification);
 			if (userRepo.existsByUsername(article.getUser().getUsername())) {
 				Users user = userRepo.findByUsername(article.getUser().getUsername());
@@ -270,13 +293,23 @@ public class ArticlesService {
 					notificationList = user.getNotifications();
 
 				}
-			
-			Notifications currentNotification=notificationRepository.findByNotifyforAndPostIdAndNotificationName("like",article.getId(),currentUser);
-			if(currentNotification.getId()!=null) {
-				notificationList.add(new NotificationsDto(currentNotification.getId(),false));
-			}
-			user.setNotifications(notificationList);
-			userRepo.save(user);
+
+				Notifications currentNotification = notificationRepository
+						.findByNotifyforAndPostIdAndNotificationName("like", article.getId(), currentUser);
+				if (currentNotification.getId() != null) {
+					notificationList.add(new NotificationsDto(currentNotification.getId(), false));
+				}
+				user.setNotifications(notificationList);
+				userRepo.save(user);
+
+				if (user.getDeviceToken() != null) {
+					PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
+					pushNotificationResponse.setTarget(user.getDeviceToken());
+					pushNotificationResponse.setTitle("like");
+					pushNotificationResponse.setBody(currentNotification.toString());
+					pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
+				}
+
 			}
 		}
 		Users user = userRepo.findByUsername(currentUser);
@@ -389,20 +422,20 @@ public class ArticlesService {
 
 	}
 
-	public boolean notificationRead(IDRequestModel notificationId, String currentUser) throws MessageException{
+	public boolean notificationRead(IDRequestModel notificationId, String currentUser) throws MessageException {
 		Users user = userRepo.findByUsername(currentUser);
 		HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
-		boolean checkNotification=false;
-		
+		boolean checkNotification = false;
+
 		if (user.getNotifications() != null) {
-			notificationList=user.getNotifications();
-			for(NotificationsDto notification:notificationList) {
-				if(notificationId.getId().equals(notification.getId())) {
+			notificationList = user.getNotifications();
+			for (NotificationsDto notification : notificationList) {
+				if (notificationId.getId().equals(notification.getId())) {
 					notification.setIsread(true);
-					checkNotification=true;
+					checkNotification = true;
 				}
 			}
-			if(!checkNotification) {
+			if (!checkNotification) {
 				throw new MessageException("User is not having this notification!!");
 			}
 			user.setNotifications(notificationList);
@@ -411,10 +444,9 @@ public class ArticlesService {
 			throw new MessageException("No notifications for the user!!!");
 
 		}
-		
+
 		return true;
-		
-		
+
 	}
 
 }

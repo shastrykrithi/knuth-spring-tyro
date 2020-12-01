@@ -28,6 +28,7 @@ public class Users {
 	private HashSet<String> liked;
 	private HashSet<NotificationsDto> notifications;
 	private String profileURL;
+	private String deviceToken;
 	
 
 	public Users() {
@@ -139,6 +140,16 @@ public class Users {
 
 	public void setProfileURL(String profileURL) {
 		this.profileURL = profileURL;
+	}
+	
+	
+
+	public String getDeviceToken() {
+		return deviceToken;
+	}
+
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
 	}
 
 	@Override

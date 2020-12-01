@@ -13,6 +13,7 @@ import ai.infrrd.training.exception.MessageException;
 import ai.infrrd.training.model.Notifications;
 import ai.infrrd.training.model.Users;
 import ai.infrrd.training.payload.request.IDRequestModel;
+import ai.infrrd.training.payload.response.PushNotificationResponse;
 import ai.infrrd.training.repository.FollowerRepository;
 import ai.infrrd.training.repository.NotificationRepository;
 import ai.infrrd.training.repository.UserRepository;
@@ -28,6 +29,9 @@ public class FollowersService {
 	
 	@Autowired
 	NotificationRepository notificationRepository;
+	
+	@Autowired
+	PushNotificationService pushNotificationService;
 
 	public HashSet<UserDto> getAllFollowers() throws MessageException {
 
@@ -119,6 +123,7 @@ public class FollowersService {
 			// set notification
 			Notifications notification = notificationRepository.findByNotifyforAndNotificationName("follow",
 					username);
+			
 			if(notification==null) {
 				notification = new Notifications("follow", username);
 				notificationRepository.save(notification);
@@ -126,17 +131,26 @@ public class FollowersService {
 			
 				if (userRepo.existsByUsername(followUser.getUsername())) {
 					if (followUser.getNotifications() != null) {
-						notificationList = user.getNotifications();
+						notificationList = followUser.getNotifications();
 
 					}
 
 					Notifications currentNotification = notificationRepository.findByNotifyforAndNotificationName("follow",
 									username);
+					
 					if (currentNotification.getId() != null) {
 						notificationList.add(new NotificationsDto(currentNotification.getId(), false));
 					}
 					followUser.setNotifications(notificationList);
 					userRepo.save(followUser);
+					
+					if (followUser.getDeviceToken() != null) {
+						PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
+						pushNotificationResponse.setTarget(user.getDeviceToken());
+						pushNotificationResponse.setTitle("follow");
+						pushNotificationResponse.setBody(currentNotification.toString());
+						pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
+					}
 				}
 			
 		}

@@ -21,6 +21,7 @@ import ai.infrrd.training.payload.request.IDRequestModel;
 import ai.infrrd.training.repository.NotificationRepository;
 import ai.infrrd.training.repository.UserRepository;
 import ai.infrrd.training.service.ArticlesService;
+import ai.infrrd.training.service.PushNotificationService;
 import ai.infrrd.training.service.ResponseModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -38,6 +39,9 @@ public class NotificationsController {
 
 	@Autowired
 	ArticlesService articlesService;
+	
+	@Autowired
+	PushNotificationService pushNotificationService;
 
 	@Autowired
 	UserRepository userRepository;
@@ -57,8 +61,8 @@ public class NotificationsController {
 			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
 		}
 		if (!notificationRepository.existsById(notificationId.getId())) {
-			logger.error("User to follow not found");
-			throw new BusinessException(HttpStatus.BAD_REQUEST, "User to follow not found");
+			logger.error("Notification with id not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Notification with id not found");
 		}
 		try {
 			articlesService.notificationRead(notificationId, AuthTokenFilter.currentUser);
@@ -69,6 +73,33 @@ public class NotificationsController {
 
 		}
 		responseModel.setData("result", "Notification Read");
+		return responseModel;
+	}
+	
+	
+//	@PostMapping("/token")
+//    public String sendPnsToDevice(@RequestBody NotificationRequestDto notificationRequestDto) {
+//        return notificationService.sendPnsToDevice(notificationRequestDto);
+//    }
+	
+	@PostMapping("/notification/activate")
+	@ApiOperation(value = "Activate push notification", notes = "device token", authorizations = {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel activateNotification(@RequestBody IDRequestModel notificationId) throws BusinessException {
+		
+		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
+		}
+		try {
+			pushNotificationService.activateNotification(notificationId, AuthTokenFilter.currentUser);
+		} catch (MessageException e) {
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
+
+		}
+		responseModel.setData("result", "Notification Feature Activated");
 		return responseModel;
 	}
 	
