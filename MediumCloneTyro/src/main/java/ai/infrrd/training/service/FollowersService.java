@@ -146,10 +146,10 @@ public class FollowersService {
 					
 					if (followUser.getDeviceToken() != null) {
 						PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
-						pushNotificationResponse.setTarget(user.getDeviceToken());
+						pushNotificationResponse.setTarget(followUser.getDeviceToken());
 						pushNotificationResponse.setTitle("follow");
 						pushNotificationResponse.setBody(currentNotification.toString());
-						pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
+						pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
 					}
 				}
 			

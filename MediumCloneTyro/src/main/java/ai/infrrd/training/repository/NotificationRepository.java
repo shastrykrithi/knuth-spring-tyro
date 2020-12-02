@@ -19,7 +19,8 @@ public interface NotificationRepository  extends MongoRepository<Notifications, 
 	
 	Notifications findByNotifyforAndNotificationName(String notifyname, String name); 
 	
-
+	Notifications findById(String id);
+	
 	boolean existsById(String id);
 
 }

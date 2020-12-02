@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,6 +102,45 @@ public class NotificationsController {
 		}
 		responseModel.setData("result", "Notification Feature Activated");
 		return responseModel;
+	}
+	
+	@PostMapping("/notification/deActivate")
+	@ApiOperation(value = "deActivate push notification", notes = "device token", authorizations = {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel deActivateNotification() throws BusinessException {
+		
+		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
+		}
+		try {
+			pushNotificationService.deActivateNotification(AuthTokenFilter.currentUser);
+		} catch (MessageException e) {
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
+
+		}
+		responseModel.setData("result", "Notification Feature De-Activated");
+		return responseModel;
+	}
+	
+	@GetMapping("/notifications")
+	@ApiOperation(value = "Get the List of notifications", notes = "The notifications for user is shown here", authorizations = {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel listOfNotifications() throws BusinessException {
+		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
+		}
+		try {
+			responseModel.setData("result", pushNotificationService.getAllNotifications(AuthTokenFilter.currentUser));
+			return responseModel;
+		} catch (MessageException e) {
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
+		}
 	}
 	
 	private void validateRequest(@RequestBody @Valid IDRequestModel notificationId, BindingResult bindingResult)

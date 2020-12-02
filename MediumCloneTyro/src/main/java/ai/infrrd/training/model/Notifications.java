@@ -14,7 +14,6 @@ public class Notifications {
 	private String postTitle;
 	private Long timestamp;
 	
-	
 	public Notifications() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -97,8 +96,6 @@ public class Notifications {
 		this.timestamp = timestamp;
 	}
 
-
-	
 
 }
 

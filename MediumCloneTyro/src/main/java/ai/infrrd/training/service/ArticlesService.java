@@ -188,7 +188,7 @@ public class ArticlesService {
 							pushNotificationResponse.setTarget(followeruser.getDeviceToken());
 							pushNotificationResponse.setTitle("publish");
 							pushNotificationResponse.setBody(currentNotification.toString());
-							pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
+							pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
 						}
 					}
 
@@ -229,7 +229,7 @@ public class ArticlesService {
 								pushNotificationResponse.setTarget(followeruser.getDeviceToken());
 								pushNotificationResponse.setTitle("topic");
 								pushNotificationResponse.setBody(currentNotification.toString());
-								pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
+								pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
 							}
 
 						}
@@ -307,7 +307,7 @@ public class ArticlesService {
 					pushNotificationResponse.setTarget(user.getDeviceToken());
 					pushNotificationResponse.setTitle("like");
 					pushNotificationResponse.setBody(currentNotification.toString());
-					pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse);
+					pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
 				}
 
 			}
