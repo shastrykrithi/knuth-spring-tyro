@@ -1,10 +1,8 @@
 package ai.infrrd.training.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,26 +36,28 @@ public class PushNotificationService {
 
 	public String sendPushNotificationToDevice(PushNotificationResponse pushNotificationResponse,
 			Notifications notification) {
-		
-		Map<String, String> notificationData=new HashMap<String, String>();
+
 		if (notification.getNotifyfor().equalsIgnoreCase("follow")) {
-			notificationData.put("id", notification.getId());
-			notificationData.put("notifyfor", notification.getNotifyfor());
-			notificationData.put("notificationName", notification.getNotificationName());
-			
-		} else {
-			notificationData.put("id", notification.getId());
-			notificationData.put("notifyfor", notification.getNotifyfor());
-			notificationData.put("notificationName", notification.getNotificationName());
-			notificationData.put("postId", notification.getPostId());
-			notificationData.put("postTitle", notification.getPostTitle());
-			notificationData.put("timestamp", notification.getTimestamp().toString());
+			pushNotificationResponse.setTitle(notification.getNotificationName()+" started following you");
+			pushNotificationResponse.setBody("");
+
+		} else if (notification.getNotifyfor().equalsIgnoreCase("like")) {
+			pushNotificationResponse.setTitle(notification.getNotificationName()+" liked your article");
+			pushNotificationResponse.setBody(notification.getPostTitle());
+
+		} else if (notification.getNotifyfor().equalsIgnoreCase("topic")) {
+			pushNotificationResponse.setTitle("New article added in topic "+notification.getNotificationName()+" that you follow");
+			pushNotificationResponse.setBody(notification.getPostTitle());
+
+		} else if (notification.getNotifyfor().equalsIgnoreCase("publish")) {
+			pushNotificationResponse.setTitle(notification.getNotificationName()+" published article");
+			pushNotificationResponse.setBody(notification.getPostTitle());
 
 		}
 		Message message = Message.builder().setToken(pushNotificationResponse.getTarget())
 				.setNotification(
 						new Notification(pushNotificationResponse.getTitle(), pushNotificationResponse.getBody()))
-				.putAllData(notificationData).build();
+				.build();
 		String response = null;
 		try {
 			response = FirebaseMessaging.getInstance().send(message);

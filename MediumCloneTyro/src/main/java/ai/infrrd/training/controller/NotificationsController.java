@@ -78,11 +78,6 @@ public class NotificationsController {
 	}
 	
 	
-//	@PostMapping("/token")
-//    public String sendPnsToDevice(@RequestBody NotificationRequestDto notificationRequestDto) {
-//        return notificationService.sendPnsToDevice(notificationRequestDto);
-//    }
-	
 	@PostMapping("/notification/activate")
 	@ApiOperation(value = "Activate push notification", notes = "device token", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)

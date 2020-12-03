@@ -161,10 +161,16 @@ public class ArticlesService {
 
 			// set notification for user followers
 
+			
 			if (!followingList.isEmpty()) {
-				Notifications notification = new Notifications("publish", username, article.getId(),
-						article.getPostTitle(), article.getTimestamp());
-				notificationRepository.save(notification);
+				Notifications currentNotification = notificationRepository.findByNotifyforAndPostId("publish",
+						article.getId());
+				if(currentNotification==null) {
+					Notifications notification = new Notifications("publish", username, article.getId(),
+							article.getPostTitle(), article.getTimestamp());
+					notificationRepository.save(notification);
+					
+				}
 				for (UserDto follower : followingList) {
 
 					if (userRepo.existsByUsername(follower.getUsername())) {
@@ -175,21 +181,24 @@ public class ArticlesService {
 
 						}
 
-						Notifications currentNotification = notificationRepository.findByNotifyforAndPostId("publish",
+						currentNotification = notificationRepository.findByNotifyforAndPostId("publish",
 								article.getId());
 						if (currentNotification.getId() != null) {
 							notificationList.add(new NotificationsDto(currentNotification.getId(), false));
 						}
 						followeruser.setNotifications(notificationList);
-						userRepo.save(followeruser);
+						if(!followeruser.getUsername().equals(username)) {
+							userRepo.save(followeruser);
 
-						if (followeruser.getDeviceToken() != null) {
-							PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
-							pushNotificationResponse.setTarget(followeruser.getDeviceToken());
-							pushNotificationResponse.setTitle("publish");
-							pushNotificationResponse.setBody(currentNotification.toString());
-							pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
+							if (followeruser.getDeviceToken() != null) {
+								PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
+								pushNotificationResponse.setTarget(followeruser.getDeviceToken());
+								pushNotificationResponse.setTitle("publish");
+								pushNotificationResponse.setBody(currentNotification.toString());
+								pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
+							}
 						}
+						
 					}
 
 				}
@@ -202,9 +211,14 @@ public class ArticlesService {
 
 				Optional<Topics> optionalTopic = topicRepository.findById(topic.getId());
 				if (optionalTopic.isPresent()) {
-					Notifications notification = new Notifications("topic", optionalTopic.get().getTopicName(),
-							article.getId(), article.getPostTitle(), article.getTimestamp());
-					notificationRepository.save(notification);
+					Notifications currentNotification = notificationRepository.findByNotificationNameAndPostId(
+							optionalTopic.get().getTopicName(), article.getId());
+					if(currentNotification==null) {
+						Notifications notification = new Notifications("topic", optionalTopic.get().getTopicName(),
+								article.getId(), article.getPostTitle(), article.getTimestamp());
+						notificationRepository.save(notification);
+					}
+					
 
 					for (UserDto follower : optionalTopic.get().getUsers()) {
 
@@ -216,22 +230,23 @@ public class ArticlesService {
 
 							}
 
-							Notifications currentNotification = notificationRepository.findByNotificationNameAndPostId(
+							currentNotification = notificationRepository.findByNotificationNameAndPostId(
 									optionalTopic.get().getTopicName(), article.getId());
 							if (currentNotification.getId() != null) {
 								notificationList.add(new NotificationsDto(currentNotification.getId(), false));
 							}
 							followeruser.setNotifications(notificationList);
-							userRepo.save(followeruser);
-
-							if (followeruser.getDeviceToken() != null) {
-								PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
-								pushNotificationResponse.setTarget(followeruser.getDeviceToken());
-								pushNotificationResponse.setTitle("topic");
-								pushNotificationResponse.setBody(currentNotification.toString());
-								pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
+							if(!followeruser.getUsername().equals(username)) {
+								userRepo.save(followeruser);
+								if (followeruser.getDeviceToken() != null) {
+									PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
+									pushNotificationResponse.setTarget(followeruser.getDeviceToken());
+									pushNotificationResponse.setTitle("topic");
+									pushNotificationResponse.setBody(currentNotification.toString());
+									pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
+								}
 							}
-
+						
 						}
 					}
 
@@ -284,9 +299,14 @@ public class ArticlesService {
 			articleRepository.save(article);
 
 			// set notification
-			Notifications notification = new Notifications("like", currentUser, article.getId(), article.getPostTitle(),
-					article.getTimestamp());
-			notificationRepository.save(notification);
+			Notifications currentNotification = notificationRepository
+					.findByNotifyforAndPostIdAndNotificationName("like", article.getId(), currentUser);
+			if(currentNotification==null) {
+				Notifications notification = new Notifications("like", currentUser, article.getId(), article.getPostTitle(),
+						article.getTimestamp());
+				notificationRepository.save(notification);
+			}
+			
 			if (userRepo.existsByUsername(article.getUser().getUsername())) {
 				Users user = userRepo.findByUsername(article.getUser().getUsername());
 				if (user.getNotifications() != null) {
@@ -294,21 +314,26 @@ public class ArticlesService {
 
 				}
 
-				Notifications currentNotification = notificationRepository
+				currentNotification = notificationRepository
 						.findByNotifyforAndPostIdAndNotificationName("like", article.getId(), currentUser);
 				if (currentNotification.getId() != null) {
 					notificationList.add(new NotificationsDto(currentNotification.getId(), false));
 				}
 				user.setNotifications(notificationList);
-				userRepo.save(user);
+				if(!user.getUsername().equals(currentUser)) {
+					System.out.println(user.getUsername());
+					System.out.println(currentUser);
+					userRepo.save(user);
 
-				if (user.getDeviceToken() != null) {
-					PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
-					pushNotificationResponse.setTarget(user.getDeviceToken());
-					pushNotificationResponse.setTitle("like");
-					pushNotificationResponse.setBody(currentNotification.toString());
-					pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
+					if (user.getDeviceToken() != null) {
+						PushNotificationResponse pushNotificationResponse = new PushNotificationResponse();
+						pushNotificationResponse.setTarget(user.getDeviceToken());
+						pushNotificationResponse.setTitle("like");
+						pushNotificationResponse.setBody(currentNotification.toString());
+						pushNotificationService.sendPushNotificationToDevice(pushNotificationResponse,currentNotification);
+					}
 				}
+				
 
 			}
 		}

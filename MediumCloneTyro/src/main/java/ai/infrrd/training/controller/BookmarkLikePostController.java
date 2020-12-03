@@ -154,7 +154,7 @@ public class BookmarkLikePostController {
 	}
 
 	@PostMapping("/like/remove")
-	@ApiOperation(value = "User request to bookmark article", notes = "Provide postID to bookmark", authorizations = {
+	@ApiOperation(value = "User request to unlike article", notes = "Provide postID to unlike", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
 	public ResponseModel unlikeArticle(@RequestBody @Valid IDRequestModel idRequestModel, BindingResult bindingResult)
 			throws BusinessException {
