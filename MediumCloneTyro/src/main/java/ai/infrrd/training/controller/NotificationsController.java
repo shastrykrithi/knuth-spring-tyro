@@ -53,7 +53,7 @@ public class NotificationsController {
 	@PostMapping("/notification/read")
 	@ApiOperation(value = "Make notification as read", notes = "notification id to make it read", authorizations = {
 			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
-	public ResponseModel followTopic(@RequestBody @Valid IDRequestModel notificationId, BindingResult bindingResult) throws BusinessException {
+	public ResponseModel notificationRead(@RequestBody @Valid IDRequestModel notificationId, BindingResult bindingResult) throws BusinessException {
 		
 		validateRequest(notificationId,bindingResult);
 		
@@ -74,6 +74,29 @@ public class NotificationsController {
 
 		}
 		responseModel.setData("result", "Notification Read");
+		return responseModel;
+	}
+	
+	@PostMapping("/notification/clear")
+	@ApiOperation(value = "Make notification list clear", notes = "Make notification list clear", authorizations = {
+			@Authorization(value = "jwtToken") }, response = ResponseModel.class)
+	public ResponseModel notificationClear() throws BusinessException {
+		
+		
+		if (!userRepository.existsByUsername(AuthTokenFilter.currentUser)) {
+			logger.error("User not found");
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "User not found");
+		}
+		
+		try {
+			articlesService.notificationClear(AuthTokenFilter.currentUser);
+		} catch (MessageException e) {
+			logger.error(e.getMessage());
+			responseModel.setData("error", e.getMessage());
+			return responseModel;
+
+		}
+		responseModel.setData("result", "Notification cleared");
 		return responseModel;
 	}
 	

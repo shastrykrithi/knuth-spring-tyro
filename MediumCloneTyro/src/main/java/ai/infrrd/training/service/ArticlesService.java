@@ -474,4 +474,18 @@ public class ArticlesService {
 
 	}
 
+	public boolean notificationClear(String currentUser) throws MessageException{
+		Users user = userRepo.findByUsername(currentUser);
+		HashSet<NotificationsDto> notificationList = new HashSet<NotificationsDto>();
+		if (user.getNotifications() != null) {
+			notificationList = user.getNotifications();
+			notificationList.clear();
+			user.setNotifications(notificationList);
+			userRepo.save(user);
+		}
+		return true;
+		
+		
+	}
+
 }
